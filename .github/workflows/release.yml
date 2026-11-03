@@ -1,8 +1,12 @@
 name: Release
 
 # On main: open or update the "Version packages" PR from pending changesets. Merging that PR
-# publishes every changed package to npm, with provenance. The canary job publishes a snapshot
-# of main for the platform repo to test against (ADR 016).
+# publishes every changed package to npm. The canary job publishes a snapshot of main for the
+# platform repo to test against (ADR 016).
+#
+# Publishing uses npm trusted publishing: npm trusts this workflow file (release.yml) in this
+# repo, GitHub's OIDC token (id-token: write) proves it's us, and provenance comes with it. There
+# is no npm token. Renaming this file breaks publishing until npm's settings are updated.
 
 on:
   push:
@@ -31,7 +35,6 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-          registry-url: https://registry.npmjs.org
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - uses: changesets/action@v2
@@ -40,9 +43,6 @@ jobs:
           publish-script: pnpm changeset publish
           commit-message: Version packages
           pr-title: Version packages
-        env:
-          NPM_CONFIG_PROVENANCE: "true"
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   canary:
     if: github.event_name == 'workflow_dispatch' && inputs.canary
@@ -57,11 +57,7 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-          registry-url: https://registry.npmjs.org
       - run: pnpm install --frozen-lockfile
       - run: pnpm changeset version --snapshot canary
       - run: pnpm build
       - run: pnpm changeset publish --tag canary --git-tag false
-        env:
-          NPM_CONFIG_PROVENANCE: "true"
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
