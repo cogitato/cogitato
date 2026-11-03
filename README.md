@@ -37,7 +37,7 @@ Everything here runs on one person's machine and is free. Team features (a share
 3. [Roadmap](docs/roadmap.md) and [decisions](docs/decisions/)
 
 ## Status
-Phases 0–3 are built: contract, runtime, kit CLI, plugin and MCP server, canvas, and Netlify preview config. The [distribution phase](docs/roadmap.md) publishes them to npm. Next is Phase 4: comments and the team canvas, in the platform.
+Phases 0–3 are built: contract, runtime, kit CLI, plugin and MCP server, canvas, and Netlify preview config. They're on npm as `@cogitato/*` 0.1.0, and the plugin installs from this repo's marketplace. Next is Phase 4: comments and the team canvas, in the platform.
 
 ## Develop
 See [CONTRIBUTING.md](CONTRIBUTING.md).

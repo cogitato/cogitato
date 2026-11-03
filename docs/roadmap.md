@@ -29,7 +29,7 @@ Pick one **pilot product** with a known design system to use throughout Phases 1
 
 **Exit:** pushing a branch shows the whole flow as live frames on the hosted canvas.
 
-## Distribution (before Phase 4, about 1 week)
+## Distribution (before Phase 4, about 1 week) — done 2026-11-03
 Open core, per [ADR 015](decisions/015-open-core-and-hosted-platform.md):
 - Publish `@cogitato/*` to public npm with versioned releases (Changesets plus a GitHub Action).
 - Make the template stand-alone: pinned versions, and `npm create cogitato`.
@@ -39,6 +39,8 @@ Open core, per [ADR 015](decisions/015-open-core-and-hosted-platform.md):
 Name, license, release process and the create command: [ADR 016](decisions/016-naming-and-distribution.md).
 
 **Exit:** a prototype created outside this repo installs from npm, validates, builds with snapshots, and loads the plugin from the public marketplace.
+
+Met on 2026-11-03 with 0.1.0 from public npm and the marketplace at `JaffeJoseph/cogitato`. Releases are staged by CI and made public by a maintainer (ADR 016). The platform repo is `JaffeJoseph/cogitato-platform` (private).
 
 ## Phase 4 — Annotations (2–3 weeks, platform repo)
 - Comment service with anchors, types, realtime, version awareness ([08](architecture/components/08-annotations.md))
