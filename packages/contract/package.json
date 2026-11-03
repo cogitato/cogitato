@@ -1,6 +1,6 @@
 {
   "name": "@cogitato/contract",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "JSON Schemas, generated types and validators for the Cogitato shared formats",
   "license": "Apache-2.0",
   "repository": {
