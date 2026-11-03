@@ -14,7 +14,8 @@
     "test": "pnpm -r run test",
     "check:packages": "node scripts/check-packages.mjs",
     "changeset": "changeset",
-    "release:stage": "pnpm stage publish -r --no-git-checks"
+    "release:stage": "pnpm stage publish -r --no-git-checks",
+    "release:approve": "node scripts/approve-staged.mjs"
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.3"

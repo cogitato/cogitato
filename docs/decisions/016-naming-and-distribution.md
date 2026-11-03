@@ -40,12 +40,13 @@ ADR 015 makes the local tool open source. Publishing needed three things settled
 - Contributors sign off commits (DCO, `git commit -s`; see `CONTRIBUTING.md`). A CLA comes up only if dual licensing does (#17).
 
 ### Packages and releases
-- **Published:** `@cogitato/contract`, `runtime`, `canvas`, `kit-cli`, `kit-mcp`, and `create-cogitato`, on public npm with provenance.
+- **Published:** `@cogitato/contract`, `runtime`, `canvas`, `kit-cli`, `kit-mcp`, and `create-cogitato`, on public npm.
 - **One version:** they form one **fixed** Changesets group. A prototype pins one version for everything, and `create-cogitato`'s version is the version it pins.
 - **`.github/workflows/release.yml`:**
-  - Pending changesets open a "Version packages" PR on `main`, and merging it publishes.
-  - A manual **canary** run publishes `0.0.0-canary-<commit>` under the `canary` dist-tag, for the platform repo.
-- **Publishing** uses npm trusted publishing (GitHub OIDC from `release.yml`), with no npm token. The first 0.1.0 publish was done by hand, because npm only lets you set up trusted publishing on a package that exists. That's why 0.1.0 has no provenance; later versions do.
+  - Pending changesets open a "Version packages" PR on `main`, and merging it stages the new version.
+  - A manual **canary** run stages `0.0.0-canary-<commit>` under the `canary` dist-tag, for the platform repo.
+- **Staged publishing:** CI never makes anything public. `pnpm release:stage` (`pnpm stage publish -r`) uploads each new version to npm, which holds it out of sight. A maintainer runs `pnpm release:approve`, which lists what's staged and, after a yes and npm's 2FA, approves the six packages dependencies first. A stolen CI run can stage at most; it can't ship.
+- **Signing in to npm:** CI stages through npm trusted publishing (GitHub OIDC from `release.yml`), with no npm token. Each package's trusted-publisher settings allow staging only, not direct publishing. The first 0.1.0 publish was done by hand, because npm only lets you set up trusted publishing on a package that exists.
 - **`.github/workflows/ci.yml`** builds, typechecks and tests on every PR. It also checks that generated types are current, that the template build changes nothing committed, and that each package ships the right files (`scripts/check-packages.mjs`).
 
 ### Starting a prototype: `npm create cogitato@latest <folder>`

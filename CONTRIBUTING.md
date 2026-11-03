@@ -21,4 +21,4 @@ pnpm --filter @cogitato/template-prototype-react dev   # http://localhost:5173, 
 Read [`CLAUDE.md`](CLAUDE.md) and the [architecture docs](docs/architecture/overview.md) before larger changes. File formats in [`interfaces.md`](docs/architecture/interfaces.md) are contracts between packages: change one only together with its schema, `schemaVersion` and every consumer. Decisions are recorded as ADRs in [`docs/decisions/`](docs/decisions).
 
 ## Releasing a change
-If your change should reach npm, add a changeset: `pnpm changeset`, pick the bump, and describe it for people using Cogitato. All packages share one version. Merging the "Version packages" PR publishes them.
+If your change should reach npm, add a changeset: `pnpm changeset`, pick the bump, and describe it for people using Cogitato. All packages share one version. Merging the "Version packages" PR stages the release on npm, and a maintainer makes it public with `pnpm release:approve`.
