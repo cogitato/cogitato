@@ -62,7 +62,7 @@ ADR 015 makes the local tool open source. Publishing needed three things settled
 - The platform lives in a separate private repo (ADR 015) that depends on the published packages, or on canaries.
 
 ## Consequences
-- The repo owner in package metadata, the template settings and docs is `JaffeJoseph/cogitato`. Change it everywhere if the public repo lands under an organization.
+- The repo lives under the `cogitato` GitHub organization (`cogitato/cogitato`), moved there from a personal account on 2026-11-03. GitHub redirects the old address; 0.1.0's npm provenance still names it.
 - Renaming the product later means changing:
   - the npm scope and the `create-` package;
   - the plugin and marketplace names;

@@ -5,11 +5,11 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JaffeJoseph/cogitato.git",
+    "url": "git+https://github.com/cogitato/cogitato.git",
     "directory": "packages/kit-cli"
   },
-  "homepage": "https://github.com/JaffeJoseph/cogitato/tree/main/packages/kit-cli#readme",
-  "bugs": "https://github.com/JaffeJoseph/cogitato/issues",
+  "homepage": "https://github.com/cogitato/cogitato/tree/main/packages/kit-cli#readme",
+  "bugs": "https://github.com/cogitato/cogitato/issues",
   "engines": {
     "node": ">=22"
   },

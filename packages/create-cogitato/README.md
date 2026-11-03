@@ -1,6 +1,6 @@
 # create-cogitato
 
-Start a new [Cogitato](https://github.com/JaffeJoseph/cogitato) prototype:
+Start a new [Cogitato](https://github.com/cogitato/cogitato) prototype:
 
 ```
 npm create cogitato@latest my-prototype

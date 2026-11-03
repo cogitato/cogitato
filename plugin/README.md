@@ -15,10 +15,10 @@ The plugin has no dependencies of its own. Its launchers in `scripts/` run the k
 
 ## Install
 The repo root is the marketplace ([ADR 009](../docs/decisions/009-plugin-distribution.md)).
-- **Designers:** nothing to do. Every prototype made from the template has a `.claude/settings.json` that declares the `JaffeJoseph/cogitato` marketplace and turns the plugin on. Claude Code fetches and loads it once the prototype folder is trusted. Designers need read access to the private repo through git credentials on their machine (for example `gh auth login`).
+- **Designers:** nothing to do. Every prototype made from the template has a `.claude/settings.json` that declares the `cogitato/cogitato` marketplace and turns the plugin on. Claude Code fetches and loads it once the prototype folder is trusted. The repo is public, so no GitHub sign-in is needed.
 - **By hand:**
   ```
-  claude plugin install cogitato --marketplace JaffeJoseph/cogitato
+  claude plugin install cogitato --marketplace cogitato/cogitato
   ```
 - **For development:** `claude --plugin-dir /path/to/Cogitato/plugin`.
 

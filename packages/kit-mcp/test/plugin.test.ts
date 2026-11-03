@@ -37,7 +37,7 @@ describe("plugin files", () => {
   it("is turned on by the template's project settings, from this repo's marketplace", () => {
     const settings = readJson(join(templateDir, ".claude/settings.json"));
     const market = readJson(join(repo, ".claude-plugin/marketplace.json"));
-    expect(settings.extraKnownMarketplaces[market.name].source).toMatchObject({ source: "github", repo: "JaffeJoseph/cogitato" });
+    expect(settings.extraKnownMarketplaces[market.name].source).toMatchObject({ source: "github", repo: "cogitato/cogitato" });
     expect(settings.enabledPlugins).toEqual({ [`${market.plugins[0].name}@${market.name}`]: true });
     // A relative-path source is what lets project settings fetch the plugin without an install step.
     expect(market.plugins[0].source).toMatch(/^\.\//);

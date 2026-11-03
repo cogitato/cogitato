@@ -4,7 +4,7 @@
     "cogitato": {
       "source": {
         "source": "github",
-        "repo": "JaffeJoseph/cogitato",
+        "repo": "cogitato/cogitato",
         "sparsePaths": [".claude-plugin", "plugin"]
       },
       "autoUpdate": true

@@ -40,7 +40,7 @@ Name, license, release process and the create command: [ADR 016](decisions/016-n
 
 **Exit:** a prototype created outside this repo installs from npm, validates, builds with snapshots, and loads the plugin from the public marketplace.
 
-Met on 2026-11-03 with 0.1.0 from public npm and the marketplace at `JaffeJoseph/cogitato`. Releases are staged by CI and made public by a maintainer (ADR 016). The platform repo is `JaffeJoseph/cogitato-platform` (private).
+Met on 2026-11-03 with 0.1.0 from public npm and the marketplace at `cogitato/cogitato`. Releases are staged by CI and made public by a maintainer (ADR 016). The platform repo is `cogitato/cogitato-platform` (private).
 
 ## Phase 4 — Annotations (2–3 weeks, platform repo)
 - Comment service with anchors, types, realtime, version awareness ([08](architecture/components/08-annotations.md))

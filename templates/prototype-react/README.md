@@ -1,6 +1,6 @@
 # Your prototype
 
-A coded prototype made with [Cogitato](https://github.com/JaffeJoseph/cogitato): real screens and states, built from plain-language requests in Claude Code and kept to your team's design system.
+A coded prototype made with [Cogitato](https://github.com/cogitato/cogitato): real screens and states, built from plain-language requests in Claude Code and kept to your team's design system.
 
 ## Working on it
 - Open this folder in Claude Code and describe what you want: "add a review screen before payment", "show what happens when the card is expired". If anything's missing on this computer, Claude offers to set it up.

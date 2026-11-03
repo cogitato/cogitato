@@ -6,7 +6,7 @@
 
 ## Decision
 - The Claude Code plugin lives in `plugin/`, and this repo is its marketplace: `.claude-plugin/marketplace.json` at the root, named `cogitato`, with one plugin `cogitato` whose source is `./plugin`.
-- For the pilot the repo is the **private GitHub repo [JaffeJoseph/cogitato](https://github.com/JaffeJoseph/cogitato)**.
+- For the pilot the repo was a private GitHub repo. It is now public at [cogitato/cogitato](https://github.com/cogitato/cogitato) (ADR 016).
 - The prototype template ships `.claude/settings.json`:
   - It declares the marketplace under `extraKnownMarketplaces`: a GitHub source with `sparsePaths` limited to `.claude-plugin` and `plugin`, and `autoUpdate: true`.
   - It turns the plugin on with `enabledPlugins: { "cogitato@cogitato": true }`.
