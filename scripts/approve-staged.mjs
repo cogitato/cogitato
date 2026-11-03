@@ -3,6 +3,7 @@
 //   pnpm release:approve              lists what's staged, then approves one version after a yes
 //   pnpm release:approve <version>    picks that version when more than one is staged
 //   pnpm release:approve --list       only lists
+//   pnpm release:approve --reject     throws a staged version away instead (it never goes public)
 //
 // Packages are approved dependencies first, so nobody can install one whose dependencies aren't
 // public yet. npm asks for the one-time password itself.
@@ -30,6 +31,7 @@ const staged = ORDER.flatMap((name) => {
 });
 
 const args = process.argv.slice(2);
+const reject = args.includes("--reject");
 const versions = [...new Set(staged.map((s) => s.version))];
 if (!staged.length) {
   console.log("Nothing is staged.");
@@ -45,29 +47,33 @@ if (!version) {
 }
 const picked = ORDER.map((name) => staged.find((s) => s.packageName === name && s.version === version)).filter(Boolean);
 const missing = ORDER.filter((name) => !picked.some((s) => s.packageName === name));
-if (missing.length) {
+if (missing.length && !reject) {
   console.error(`\n${version} isn't staged for ${missing.join(", ")}. All six go out together, so nothing was approved.`);
   process.exit(1);
 }
 // npm checks each upload for a minute or so after staging ("validating") before it can be approved.
-const notReady = picked.filter((s) => s.status !== "staged");
+const notReady = reject ? [] : picked.filter((s) => s.status !== "staged");
 if (notReady.length) {
   console.error(`\nnpm is still checking ${notReady.map((s) => s.packageName).join(", ")}. Try again in a minute.`);
   process.exit(1);
 }
 
 const rl = createInterface({ input: process.stdin, output: process.stdout });
-const answer = await rl.question(`\nMake ${version} public for all ${picked.length} packages (tag "${picked[0].tag}")? This can't be undone. [y/N] `);
+const question = reject
+  ? `\nThrow away staged ${version} for ${picked.length} packages? It won't go public. [y/N] `
+  : `\nMake ${version} public for all ${picked.length} packages (tag "${picked[0].tag}")? This can't be undone. [y/N] `;
+const answer = await rl.question(question);
 rl.close();
 if (answer.trim().toLowerCase() !== "y") {
-  console.log("Nothing was approved.");
+  console.log(`Nothing was ${reject ? "rejected" : "approved"}.`);
   process.exit(0);
 }
+const verb = reject ? "reject" : "approve";
 for (const s of picked) {
-  console.log(`\nApproving ${s.packageName}@${s.version}...`);
-  if (pnpm(["stage", "approve", s.id], { stdio: "inherit" }).status !== 0) {
-    console.error(`Approving ${s.packageName} failed, so the rest weren't approved. Fix it and run this again: it picks up where it stopped.`);
+  console.log(`\n${reject ? "Rejecting" : "Approving"} ${s.packageName}@${s.version}...`);
+  if (pnpm(["stage", verb, s.id], { stdio: "inherit" }).status !== 0) {
+    console.error(`That failed for ${s.packageName}, so the rest were left alone. Fix it and run this again: it picks up where it stopped.`);
     process.exit(1);
   }
 }
-console.log(`\n${version} is public.`);
+console.log(reject ? `\n${version} was thrown away.` : `\n${version} is public.`);
