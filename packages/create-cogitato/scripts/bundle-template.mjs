@@ -22,7 +22,8 @@ const pkgPath = join(out, "package.json");
 const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
 for (const field of ["dependencies", "devDependencies"]) {
   for (const [name, range] of Object.entries(pkg[field] ?? {})) {
-    if (String(range).startsWith("workspace:")) pkg[field][name] = `^${version}`;
+    // A canary (0.0.0-canary-<commit>) pins exactly: a ^ range could pick up another canary.
+    if (String(range).startsWith("workspace:")) pkg[field][name] = version.includes("-") ? version : `^${version}`;
   }
 }
 // The new prototype is the customer's work, not part of Cogitato: no name, license or blurb of ours.

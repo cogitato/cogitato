@@ -20,6 +20,6 @@
     "@cogitato/template-prototype-react"
   ],
   "snapshot": {
-    "prereleaseTemplate": "canary-{commit}"
+    "prereleaseTemplate": "{tag}-{commit}"
   }
 }
