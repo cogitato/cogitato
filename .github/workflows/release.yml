@@ -60,7 +60,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       # Snapshots need a pending changeset. One package is enough: the fixed group moves them all.
       - name: Add a throwaway changeset
-        run: printf -- '---\n"@cogitato/contract": patch\n---\n\nCanary snapshot.\n' > .changeset/canary-snapshot.md
+        run: |
+          printf -- '---\n"@cogitato/contract": patch\n---\n\nCanary snapshot.\n' > .changeset/canary-snapshot.md
       - run: pnpm changeset version --snapshot canary
       - run: pnpm build
       - run: pnpm changeset publish --tag canary --git-tag false
