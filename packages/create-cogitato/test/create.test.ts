@@ -3,7 +3,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "no
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { afterEach, beforeAll, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { CreateError, createPrototype, packageName } from "../src/create.js";
 
 const pkgDir = fileURLToPath(new URL("..", import.meta.url));
@@ -17,6 +17,7 @@ beforeAll(() => {
 afterEach(() => {
   if (tmp) rmSync(tmp, { recursive: true, force: true });
   tmp = undefined;
+  vi.unstubAllEnvs();
 });
 
 describe("the bundled template", () => {
@@ -46,6 +47,11 @@ describe("createPrototype", () => {
   });
 
   it("starts git history when asked", () => {
+    // CI machines have no git identity of their own.
+    for (const who of ["AUTHOR", "COMMITTER"]) {
+      vi.stubEnv(`GIT_${who}_NAME`, "Test Designer");
+      vi.stubEnv(`GIT_${who}_EMAIL`, "designer@example.com");
+    }
     tmp = mkdtempSync(join(tmpdir(), "create-cogitato-"));
     const r = createPrototype({ target: join(tmp, "p"), install: false });
     expect(r.git).toBe("committed");

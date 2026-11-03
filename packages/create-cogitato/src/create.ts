@@ -76,6 +76,8 @@ export function createPrototype(opts: CreateOptions): CreateResult {
     if (run("git", ["init", "-q"], dir)) {
       git = "initialized";
       if (run("git", ["add", "-A"], dir) && run("git", ["commit", "-q", "-m", "Start the prototype from Cogitato"], dir)) git = "committed";
+      // Usually git doesn't know your name and email yet. Saving a version later sorts it out.
+      else log("Git history is started, but the first save didn't happen. That's fine: open the folder in Claude Code and ask it to set up this computer.");
     }
   }
   return { dir, name, installed, git };
