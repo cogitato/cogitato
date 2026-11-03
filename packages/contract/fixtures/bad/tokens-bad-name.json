@@ -1,0 +1,15 @@
+{
+  "description": "Token name containing a dot",
+  "ops": [
+    {
+      "op": "set",
+      "at": "contract/tokens.json#/color/brand/brand.primary",
+      "value": {
+        "$value": "#2563eb"
+      }
+    }
+  ],
+  "expect": [
+    "schema-additionalProperties"
+  ]
+}

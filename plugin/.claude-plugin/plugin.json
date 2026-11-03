@@ -1,0 +1,17 @@
+{
+  "name": "cogitato",
+  "displayName": "Cogitato",
+  "version": "0.3.0",
+  "description": "Build coded prototypes from plain-language prompts, kept to your team's design system: screens, states, checks after every edit, and saving versions.",
+  "author": {
+    "name": "Cogitato"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "prototyping",
+    "design-system",
+    "designers"
+  ],
+  "repository": "https://github.com/JaffeJoseph/cogitato",
+  "homepage": "https://github.com/JaffeJoseph/cogitato"
+}

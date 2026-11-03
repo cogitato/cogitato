@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kit.local/schema/component.schema.json",
+  "title": "ComponentManifest",
+  "description": "design/contract/components/{kebab-name}.json: one component a prototype may use.",
+  "type": "object",
+  "required": ["name", "source", "confidence", "import", "props", "states"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "name": {
+      "description": "Component name in PascalCase. The file name is its kebab-case form (TextField → text-field.json).",
+      "type": "string",
+      "pattern": "^[A-Z][A-Za-z0-9]*$",
+      "x-hint": "Component names start with a capital letter and use no spaces, like \"TextField\"."
+    },
+    "description": {
+      "description": "One-line usage note, shown in component lists.",
+      "type": "string"
+    },
+    "source": {
+      "description": "Where the component comes from. Shown as a badge.",
+      "type": "string",
+      "enum": ["production", "figma", "generated"]
+    },
+    "confidence": {
+      "description": "How sure intake is that this matches the real design system. Shown as a badge.",
+      "type": "string",
+      "enum": ["high", "medium", "low"]
+    },
+    "import": {
+      "description": "Import path used in prototype code.",
+      "type": "string",
+      "pattern": "^@/kit/",
+      "x-hint": "Kit components are imported from \"@/kit/...\", like \"@/kit/Button\"."
+    },
+    "props": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z][A-Za-z0-9]*$",
+        "x-hint": "Prop names start with a lowercase letter and use no spaces, like \"variant\" or \"onPress\"."
+      },
+      "additionalProperties": { "$ref": "#/$defs/prop" }
+    },
+    "states": {
+      "description": "Visual states the component supports. Must include \"default\".",
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/slug" },
+      "uniqueItems": true,
+      "contains": { "const": "default" },
+      "x-hint": "The list of states must include \"default\"."
+    },
+    "rules": {
+      "description": "Usage rules in plain language.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "mapping": {
+      "title": "ComponentMapping",
+      "description": "Where this component lives in production code and Figma. Used by implement-handoff.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "production": {
+          "type": "object",
+          "required": ["path", "export"],
+          "additionalProperties": false,
+          "properties": {
+            "path": { "type": "string", "minLength": 1 },
+            "export": { "type": "string", "minLength": 1 }
+          }
+        },
+        "figma": {
+          "type": "object",
+          "required": ["componentKey"],
+          "additionalProperties": false,
+          "properties": {
+            "componentKey": { "type": "string", "minLength": 1 },
+            "nodeId": { "type": "string" }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "prop": {
+      "title": "PropDefinition",
+      "type": "object",
+      "properties": { "type": { "type": "string" } },
+      "required": ["type"],
+      "discriminator": { "propertyName": "type" },
+      "oneOf": [
+        { "$ref": "#/$defs/enumProp" },
+        { "$ref": "#/$defs/booleanProp" },
+        { "$ref": "#/$defs/stringProp" },
+        { "$ref": "#/$defs/numberProp" },
+        { "$ref": "#/$defs/nodeProp" },
+        { "$ref": "#/$defs/eventProp" }
+      ]
+    },
+    "enumProp": {
+      "title": "EnumProp",
+      "type": "object",
+      "required": ["type", "values"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "enum" },
+        "values": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "default": { "type": "string" },
+        "required": { "type": "boolean" },
+        "description": { "type": "string" }
+      }
+    },
+    "booleanProp": {
+      "title": "BooleanProp",
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "boolean" },
+        "default": { "type": "boolean" },
+        "required": { "type": "boolean" },
+        "description": { "type": "string" }
+      }
+    },
+    "stringProp": {
+      "title": "StringProp",
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "string" },
+        "default": { "type": "string" },
+        "required": { "type": "boolean" },
+        "description": { "type": "string" }
+      }
+    },
+    "numberProp": {
+      "title": "NumberProp",
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "number" },
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "default": { "type": "number" },
+        "required": { "type": "boolean" },
+        "description": { "type": "string" }
+      }
+    },
+    "nodeProp": {
+      "title": "NodeProp",
+      "description": "Content slot, such as children. v1 models composition as node props only.",
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "node" },
+        "required": { "type": "boolean" },
+        "description": { "type": "string" }
+      }
+    },
+    "eventProp": {
+      "title": "EventProp",
+      "description": "Callback, such as onPress. Wired to mock behavior in prototypes.",
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "event" },
+        "required": { "type": "boolean" },
+        "description": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "$schema": "../../../node_modules/@cogitato/contract/schema/component.schema.json",
+  "name": "Button",
+  "description": "Triggers an action. Use primary for the main action on a view.",
+  "source": "production",
+  "confidence": "high",
+  "import": "@/kit/Button",
+  "props": {
+    "variant": { "type": "enum", "values": ["primary", "secondary", "ghost", "danger"], "default": "primary" },
+    "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md" },
+    "disabled": { "type": "boolean", "default": false },
+    "loading": { "type": "boolean", "default": false, "description": "Shows a spinner and blocks presses." },
+    "fullWidth": { "type": "boolean", "default": false },
+    "children": { "type": "node", "required": true, "description": "Button label." },
+    "onPress": { "type": "event" }
+  },
+  "states": ["default", "hover", "focus", "disabled", "loading"],
+  "rules": [
+    "One primary button per view.",
+    "Labels are verbs: \"Pay now\", not \"OK\".",
+    "Use danger only for destructive actions."
+  ],
+  "mapping": {
+    "production": { "path": "src/ui/Button.tsx", "export": "Button" },
+    "figma": { "componentKey": "a1f0c3e9b2d4" }
+  }
+}

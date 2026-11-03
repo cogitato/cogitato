@@ -1,0 +1,12 @@
+{
+  "description": "Duration tokens lose their group type",
+  "ops": [
+    {
+      "op": "remove",
+      "at": "contract/tokens.json#/duration/$type"
+    }
+  ],
+  "expect": [
+    "token-missing-type"
+  ]
+}

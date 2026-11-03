@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kit.local/schema/decisions.schema.json",
+  "title": "DecisionLog",
+  "description": "design/contract/decisions.json: conflicts found during intake and how they were settled. Re-runs reuse decided answers.",
+  "type": "object",
+  "required": ["decisions"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "decisions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/decision" }
+    }
+  },
+  "$defs": {
+    "decision": {
+      "title": "Decision",
+      "type": "object",
+      "required": ["id", "topic", "question", "options", "recommendation", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^dec_[a-z0-9_-]+$",
+          "x-hint": "Decision ids start with \"dec_\", like \"dec_brand-blue\"."
+        },
+        "topic": {
+          "description": "What the decision is about, e.g. \"tokens.color.brand.600\" or \"components.Button\".",
+          "type": "string",
+          "minLength": 1
+        },
+        "question": { "type": "string", "minLength": 1 },
+        "options": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/option" }
+        },
+        "recommendation": {
+          "description": "Id of the recommended option.",
+          "type": "string"
+        },
+        "status": { "type": "string", "enum": ["open", "decided"] },
+        "choice": {
+          "description": "Id of the chosen option. Required once decided.",
+          "type": "string"
+        },
+        "decidedBy": { "type": "string" },
+        "decidedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+        "note": { "type": "string" }
+      },
+      "if": { "properties": { "status": { "const": "decided" } }, "required": ["status"] },
+      "then": { "properties": { "choice": true }, "required": ["choice"] }
+    },
+    "option": {
+      "title": "DecisionOption",
+      "type": "object",
+      "required": ["id", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/slug" },
+        "label": { "type": "string", "minLength": 1 },
+        "value": {
+          "description": "The concrete value this option would put in the contract, if any.",
+          "type": ["string", "number", "boolean", "object", "array"]
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["source", "detail"],
+            "additionalProperties": false,
+            "properties": {
+              "source": { "type": "string", "enum": ["code", "figma", "docs"] },
+              "detail": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

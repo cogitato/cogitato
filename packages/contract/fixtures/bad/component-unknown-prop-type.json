@@ -1,0 +1,13 @@
+{
+  "description": "Prop with an unsupported type",
+  "ops": [
+    {
+      "op": "set",
+      "at": "contract/components/button.json#/props/size/type",
+      "value": "list"
+    }
+  ],
+  "expect": [
+    "schema-discriminator"
+  ]
+}

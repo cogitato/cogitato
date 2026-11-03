@@ -1,0 +1,13 @@
+{
+  "description": "Two screens with the same id",
+  "ops": [
+    {
+      "op": "write",
+      "file": "src/screens/basket/screen.tsx",
+      "text": "import { defineScreen } from \"@cogitato/runtime\";\n\nexport default defineScreen({\n  id: \"cart\",\n  route: \"/basket\",\n  title: \"Basket\",\n  fixtures: { default: { data: {} } },\n  component: () => null,\n});\n"
+    }
+  ],
+  "expect": [
+    "code-duplicate-screen"
+  ]
+}

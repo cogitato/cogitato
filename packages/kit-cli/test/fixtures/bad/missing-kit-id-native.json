@@ -1,0 +1,14 @@
+{
+  "description": "Native button with a click handler and no data-kit-id",
+  "ops": [
+    {
+      "op": "replace",
+      "file": "src/screens/checkout/payment/screen.tsx",
+      "find": "<Page title=\"Payment\" step=\"Payment\">",
+      "with": "<Page title=\"Payment\" step=\"Payment\">\n      <button onClick={() => {}}>Need help?</button>"
+    }
+  ],
+  "expect": [
+    "code-missing-kit-id"
+  ]
+}

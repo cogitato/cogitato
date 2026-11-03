@@ -1,0 +1,32 @@
+.text {
+  margin: 0;
+}
+
+.body {
+  font: var(--kit-typography-body);
+}
+
+.label {
+  font: var(--kit-typography-label);
+}
+
+.heading {
+  font: var(--kit-typography-heading);
+  letter-spacing: var(--kit-typography-heading-letter-spacing);
+}
+
+.default {
+  color: var(--kit-color-text-default);
+}
+
+.muted {
+  color: var(--kit-color-text-muted);
+}
+
+.danger {
+  color: var(--kit-color-text-danger);
+}
+
+.inverse {
+  color: var(--kit-color-text-inverse);
+}

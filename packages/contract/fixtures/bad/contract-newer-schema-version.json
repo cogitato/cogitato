@@ -1,0 +1,13 @@
+{
+  "description": "Contract made by a newer Cogitato",
+  "ops": [
+    {
+      "op": "set",
+      "at": "contract/contract.json#/schemaVersion",
+      "value": 2
+    }
+  ],
+  "expect": [
+    "schema-version-too-new"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "$schema": "../../../../schema/gaps.schema.json",
+  "gaps": [
+    {
+      "id": "gap_stepper",
+      "kind": "component",
+      "name": "Stepper",
+      "context": "Show checkout progress (Cart, Shipping, Payment) at the top of each checkout screen.",
+      "screen": "checkout.shipping",
+      "workaround": "A row of Text labels in a Stack.",
+      "requestedBy": "designer_sam",
+      "status": "open",
+      "createdAt": "2026-11-01T00:00:00Z"
+    }
+  ]
+}

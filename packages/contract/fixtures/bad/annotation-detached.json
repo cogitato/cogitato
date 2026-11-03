@@ -1,0 +1,14 @@
+{
+  "description": "Comment on a state that was removed: a warning, not a failure",
+  "ok": true,
+  "ops": [
+    {
+      "op": "set",
+      "at": "annotations/checkout-review.json#/annotations/0/anchor/state",
+      "value": "expired"
+    }
+  ],
+  "expect": [
+    "annotation-unknown-state"
+  ]
+}

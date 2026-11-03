@@ -1,0 +1,24 @@
+{
+  "description": "Two screens with the same id",
+  "ops": [
+    {
+      "op": "set",
+      "at": "flows.json#/screens/4",
+      "value": {
+        "id": "cart",
+        "route": "/basket",
+        "title": "Basket",
+        "states": [
+          {
+            "id": "default",
+            "fixture": "default",
+            "title": "Basket"
+          }
+        ]
+      }
+    }
+  ],
+  "expect": [
+    "flows-duplicate-screen"
+  ]
+}

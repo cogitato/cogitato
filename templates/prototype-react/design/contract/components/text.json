@@ -1,0 +1,19 @@
+{
+  "$schema": "../../../node_modules/@cogitato/contract/schema/component.schema.json",
+  "name": "Text",
+  "description": "All text. Picks typography and color from tokens.",
+  "source": "production",
+  "confidence": "high",
+  "import": "@/kit/Text",
+  "props": {
+    "variant": { "type": "enum", "values": ["body", "label", "heading"], "default": "body" },
+    "tone": { "type": "enum", "values": ["default", "muted", "danger", "inverse"], "default": "default" },
+    "as": { "type": "enum", "values": ["p", "span", "h1", "h2", "h3", "label"], "default": "p" },
+    "children": { "type": "node", "required": true }
+  },
+  "states": ["default"],
+  "rules": ["One h1 per screen."],
+  "mapping": {
+    "production": { "path": "src/ui/Text.tsx", "export": "Text" }
+  }
+}

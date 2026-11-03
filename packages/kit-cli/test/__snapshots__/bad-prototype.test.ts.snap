@@ -1,0 +1,129 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`seeded bad prototypes > contract-problem 1`] = `
+[
+  "[error] design/contract/components/button.json "source" is "sketch", but it must be one of: "production", "figma", "generated".",
+]
+`;
+
+exports[`seeded bad prototypes > css-hardcoded-color 1`] = `
+[
+  "[error] src/kit/Button.module.css:41 #2563eb is color.brand.600 (Brand Blue 600) in the palette. Use the token instead of typing the color, so it stays in sync with the design system. => var(--kit-color-brand-600)",
+]
+`;
+
+exports[`seeded bad prototypes > css-hardcoded-size 1`] = `
+[
+  "[error] src/components/Page.module.css:4 30px isn't on the spacing scale. Use space.8 (32px) instead; it's the closest size. => var(--kit-space-8)",
+  "[error] src/components/Page.module.css:4 16px is space.4 on the spacing scale. Use the token instead of typing the size. => var(--kit-space-4)",
+]
+`;
+
+exports[`seeded bad prototypes > css-off-palette-color 1`] = `
+[
+  "[error] src/kit/Card.module.css:2 This color (#fdfdfd) isn't in the palette. Use color.surface.default instead; it's the closest match. => var(--kit-color-surface-default)",
+]
+`;
+
+exports[`seeded bad prototypes > css-unknown-token 1`] = `
+[
+  "[error] src/kit/Button.module.css:46 var(--kit-color-brand-650) isn't a token in the design system. Check the spelling; did you mean var(--kit-color-brand-600)? => var(--kit-color-brand-600)",
+]
+`;
+
+exports[`seeded bad prototypes > css-unreadable 1`] = `
+[
+  "[error] src/components/Broken.module.css:1 This stylesheet has a typo Cogitato can't read past (Unclosed block).",
+]
+`;
+
+exports[`seeded bad prototypes > fixture-bad-name 1`] = `
+[
+  "[error] src/screens/cart/screen.tsx:64 The state name "Empty" isn't valid. Use lowercase words joined by dashes, like "card-declined".",
+]
+`;
+
+exports[`seeded bad prototypes > flows-stale 1`] = `
+[
+  "[warning] design/flows.json flows.json is out of date with the screens and flows in the code. Run the flow export to update it.",
+]
+`;
+
+exports[`seeded bad prototypes > flows-unknown-step 1`] = `
+[
+  "[error] src/flows.ts:14 The "Checkout" flow mentions "checkout.payment.expired", but the Payment screen has no state called "expired" (it has: "default", "processing", "card-declined").",
+]
+`;
+
+exports[`seeded bad prototypes > inline-style-color 1`] = `
+[
+  "[error] src/screens/checkout/confirmation/screen.tsx:16 This color (red) isn't in the palette. Use color.text.danger instead; it's the closest match. => var(--kit-color-text-danger)",
+]
+`;
+
+exports[`seeded bad prototypes > inline-style-number 1`] = `
+[
+  "[error] src/screens/cart/screen.tsx:34 16px is space.4 on the spacing scale. Use the token instead of typing the size. => var(--kit-space-4)",
+]
+`;
+
+exports[`seeded bad prototypes > kit-id-bad-format 1`] = `
+[
+  "[error] src/screens/cart/screen.tsx:51 "Cart Checkout" isn't a valid element id. Element ids are the screen id plus an element name, lowercase and dot-separated, like "cart.check-out". => cart.check-out",
+]
+`;
+
+exports[`seeded bad prototypes > kit-id-computed 1`] = `
+[
+  "[warning] src/screens/cart/screen.tsx:19 This data-kit-id is computed, so Cogitato can't check it. Prefer plain text, like data-kit-id="cart.keep-shopping".",
+]
+`;
+
+exports[`seeded bad prototypes > kit-id-duplicate 1`] = `
+[
+  "[error] src/screens/checkout/payment/screen.tsx:43 "checkout.payment.expiry" is used twice on the Payment screen (also at src/screens/checkout/payment/screen.tsx, line 42). Each element needs its own id so comments land on the right one.",
+]
+`;
+
+exports[`seeded bad prototypes > kit-id-wrong-screen 1`] = `
+[
+  "[error] src/screens/cart/screen.tsx:51 "checkout.go" doesn't start with this screen's id. Elements on the Cart screen need ids starting with "cart.", like "cart.go". => cart.go",
+]
+`;
+
+exports[`seeded bad prototypes > missing-default-fixture 1`] = `
+[
+  "[error] src/flows.ts:15 The "Checkout" flow mentions "checkout.confirmation.default", but the Order confirmed screen has no state called "default" (it has: "done").",
+  "[error] src/screens/checkout/confirmation/screen.tsx:30 Order confirmed has no "default" state. Every screen needs one; it's what the screen shows when it first opens.",
+]
+`;
+
+exports[`seeded bad prototypes > missing-kit-id-kit-component 1`] = `
+[
+  "[error] src/screens/checkout/shipping/screen.tsx:37 This Button needs a data-kit-id so comments can be pinned to it. Add data-kit-id="checkout.shipping.back-to-cart". => checkout.shipping.back-to-cart",
+]
+`;
+
+exports[`seeded bad prototypes > missing-kit-id-native 1`] = `
+[
+  "[error] src/screens/checkout/payment/screen.tsx:33 This <button> needs a data-kit-id so comments can be pinned to it. Add data-kit-id="checkout.payment.need-help". => checkout.payment.need-help",
+]
+`;
+
+exports[`seeded bad prototypes > screen-duplicate 1`] = `
+[
+  "[error] src/screens/cart/screen.tsx:58 The screen id "cart" is already used by src/screens/basket/screen.tsx. Each screen needs its own id.",
+]
+`;
+
+exports[`seeded bad prototypes > screen-id-computed 1`] = `
+[
+  "[error] src/screens/cart/screen.tsx:59 Write the screen's id as plain text, like \`"checkout.payment"\`, so Cogitato can find it without running the code.",
+]
+`;
+
+exports[`seeded bad prototypes > unknown-component 1`] = `
+[
+  "[error] src/screens/checkout/shipping/screen.tsx:7 Stepper isn't in the design system yet, so it can't be used here. Use an existing component from the kit, or record it as a gap so the team can add it.",
+]
+`;

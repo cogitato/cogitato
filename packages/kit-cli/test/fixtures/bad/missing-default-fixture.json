@@ -1,0 +1,15 @@
+{
+  "description": "Screen without a default state (its flow step then breaks too)",
+  "ops": [
+    {
+      "op": "replace",
+      "file": "src/screens/checkout/confirmation/screen.tsx",
+      "find": "default: { title: \"Confirmed\"",
+      "with": "done: { title: \"Confirmed\""
+    }
+  ],
+  "expect": [
+    "code-missing-default-fixture",
+    "code-unknown-flow-step"
+  ]
+}

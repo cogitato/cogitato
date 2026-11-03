@@ -1,0 +1,52 @@
+{
+  "name": "@cogitato/kit-mcp",
+  "version": "0.1.0",
+  "description": "Kit MCP server: gives Claude Code structured access to a prototype's design contract and scaffolding actions",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JaffeJoseph/cogitato.git",
+    "directory": "packages/kit-mcp"
+  },
+  "homepage": "https://github.com/JaffeJoseph/cogitato/tree/main/packages/kit-mcp#readme",
+  "bugs": "https://github.com/JaffeJoseph/cogitato/issues",
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "kit-mcp": "./bin/kit-mcp.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "bin",
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "@cogitato/contract": "workspace:*",
+    "@cogitato/kit-cli": "workspace:*",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

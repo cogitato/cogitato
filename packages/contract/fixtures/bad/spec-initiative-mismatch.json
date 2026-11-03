@@ -1,0 +1,13 @@
+{
+  "description": "Spec initiative doesn't match its folder",
+  "ops": [
+    {
+      "op": "set",
+      "at": "handoff/checkout-v1/spec.json#/initiative",
+      "value": "checkout-v2"
+    }
+  ],
+  "expect": [
+    "spec-initiative-mismatch"
+  ]
+}

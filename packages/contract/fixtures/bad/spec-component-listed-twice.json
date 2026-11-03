@@ -1,0 +1,19 @@
+{
+  "description": "Component listed as both reused and new",
+  "ops": [
+    {
+      "op": "set",
+      "at": "handoff/checkout-v1/spec.json#/componentUsage/new/1",
+      "value": {
+        "name": "Button",
+        "usedIn": [
+          "cart"
+        ],
+        "reason": "Duplicate"
+      }
+    }
+  ],
+  "expect": [
+    "spec-component-listed-twice"
+  ]
+}

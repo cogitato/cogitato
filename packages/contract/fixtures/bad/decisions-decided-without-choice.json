@@ -1,0 +1,12 @@
+{
+  "description": "Decided decision with no choice",
+  "ops": [
+    {
+      "op": "remove",
+      "at": "contract/decisions.json#/decisions/0/choice"
+    }
+  ],
+  "expect": [
+    "schema-required"
+  ]
+}

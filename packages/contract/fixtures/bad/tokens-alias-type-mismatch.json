@@ -1,0 +1,13 @@
+{
+  "description": "Color token aliasing a spacing token",
+  "ops": [
+    {
+      "op": "set",
+      "at": "contract/tokens.json#/color/border/focus/$value",
+      "value": "{space.4}"
+    }
+  ],
+  "expect": [
+    "token-alias-type-mismatch"
+  ]
+}

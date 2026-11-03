@@ -1,0 +1,13 @@
+{
+  "description": "Spec lists a state the prototype doesn't have",
+  "ops": [
+    {
+      "op": "set",
+      "at": "handoff/checkout-v1/spec.json#/flowMap/states/0/node",
+      "value": "cart.full"
+    }
+  ],
+  "expect": [
+    "spec-unknown-node"
+  ]
+}

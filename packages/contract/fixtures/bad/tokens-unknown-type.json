@@ -1,0 +1,13 @@
+{
+  "description": "Group type that isn't a supported token type",
+  "ops": [
+    {
+      "op": "set",
+      "at": "contract/tokens.json#/duration/$type",
+      "value": "time"
+    }
+  ],
+  "expect": [
+    "schema-enum"
+  ]
+}

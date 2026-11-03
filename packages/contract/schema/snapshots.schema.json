@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kit.local/schema/snapshots.schema.json",
+  "title": "SnapshotManifest",
+  "description": "__kit-data/snapshots.json in a built prototype: one screenshot per screen state, written by `kit snapshots` and read by the canvas so zoomed-out frames load instantly.",
+  "type": "object",
+  "required": ["schemaVersion", "viewport", "frames"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "$ref": "common.schema.json#/$defs/schemaVersion" },
+    "commit": { "$ref": "common.schema.json#/$defs/commit" },
+    "viewport": {
+      "description": "Size of the browser window each snapshot was taken at, in CSS pixels.",
+      "type": "object",
+      "required": ["width", "height"],
+      "additionalProperties": false,
+      "properties": {
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "frames": {
+      "description": "Image path per state, relative to __kit-data/.",
+      "type": "object",
+      "propertyNames": { "$ref": "common.schema.json#/$defs/nodeRef" },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^snapshots/[A-Za-z0-9._-]+\\.(jpg|png|webp)$"
+      }
+    }
+  }
+}

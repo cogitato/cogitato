@@ -1,0 +1,24 @@
+{
+  "description": "Screen without a default state",
+  "ops": [
+    {
+      "op": "set",
+      "at": "flows.json#/screens/4",
+      "value": {
+        "id": "account",
+        "route": "/account",
+        "title": "Account",
+        "states": [
+          {
+            "id": "signed-in",
+            "fixture": "signed-in",
+            "title": "Signed in"
+          }
+        ]
+      }
+    }
+  ],
+  "expect": [
+    "flows-missing-default-state"
+  ]
+}

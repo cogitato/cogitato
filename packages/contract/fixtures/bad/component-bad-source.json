@@ -1,0 +1,13 @@
+{
+  "description": "Unknown component source",
+  "ops": [
+    {
+      "op": "set",
+      "at": "contract/components/button.json#/source",
+      "value": "sketch"
+    }
+  ],
+  "expect": [
+    "schema-enum"
+  ]
+}

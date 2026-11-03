@@ -1,0 +1,13 @@
+{
+  "description": "fallbackRect outside the frame",
+  "ops": [
+    {
+      "op": "set",
+      "at": "annotations/checkout-review.json#/annotations/0/anchor/fallbackRect/x",
+      "value": 1.5
+    }
+  ],
+  "expect": [
+    "schema-maximum"
+  ]
+}

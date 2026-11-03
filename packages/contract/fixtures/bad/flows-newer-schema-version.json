@@ -1,0 +1,13 @@
+{
+  "description": "flows.json from a newer Cogitato",
+  "ops": [
+    {
+      "op": "set",
+      "at": "flows.json#/schemaVersion",
+      "value": 3
+    }
+  ],
+  "expect": [
+    "schema-version-too-new"
+  ]
+}

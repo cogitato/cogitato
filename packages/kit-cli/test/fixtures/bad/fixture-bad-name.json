@@ -1,0 +1,14 @@
+{
+  "description": "State name with a capital letter",
+  "ops": [
+    {
+      "op": "replace",
+      "file": "src/screens/cart/screen.tsx",
+      "find": "empty: { title:",
+      "with": "Empty: { title:"
+    }
+  ],
+  "expect": [
+    "code-invalid-fixture-name"
+  ]
+}

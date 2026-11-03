@@ -1,0 +1,43 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kit-space-1);
+}
+
+.label {
+  font: var(--kit-typography-label);
+  color: var(--kit-color-text-default);
+}
+
+.input {
+  font: var(--kit-typography-body);
+  padding: var(--kit-space-2) var(--kit-space-3);
+  border: 1px solid var(--kit-color-border-default);
+  border-radius: var(--kit-radius-md);
+  background: var(--kit-color-surface-default);
+  color: var(--kit-color-text-default);
+}
+
+.input:focus {
+  outline: 2px solid var(--kit-color-border-focus);
+  outline-offset: -1px;
+}
+
+.input:disabled {
+  background: var(--kit-color-neutral-100);
+  color: var(--kit-color-text-muted);
+}
+
+.invalid {
+  border-color: var(--kit-color-feedback-danger);
+}
+
+.hint {
+  font-size: var(--kit-font-size-sm);
+  color: var(--kit-color-text-muted);
+}
+
+.error {
+  font-size: var(--kit-font-size-sm);
+  color: var(--kit-color-text-danger);
+}

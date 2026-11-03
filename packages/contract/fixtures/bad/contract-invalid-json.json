@@ -1,0 +1,13 @@
+{
+  "description": "gaps.json has a JSON typo",
+  "ops": [
+    {
+      "op": "writeText",
+      "at": "contract/gaps.json",
+      "text": "{ \"gaps\": [ }"
+    }
+  ],
+  "expect": [
+    "file-invalid-json"
+  ]
+}

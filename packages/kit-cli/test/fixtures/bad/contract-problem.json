@@ -1,0 +1,14 @@
+{
+  "description": "Contract errors come through kit validate too",
+  "ops": [
+    {
+      "op": "replace",
+      "file": "design/contract/components/button.json",
+      "find": "\"source\": \"production\"",
+      "with": "\"source\": \"sketch\""
+    }
+  ],
+  "expect": [
+    "schema-enum"
+  ]
+}

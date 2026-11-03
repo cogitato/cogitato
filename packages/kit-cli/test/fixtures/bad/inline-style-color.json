@@ -1,0 +1,14 @@
+{
+  "description": "Inline style color as a named color",
+  "ops": [
+    {
+      "op": "replace",
+      "file": "src/screens/checkout/confirmation/screen.tsx",
+      "find": "<Text tone=\"muted\">",
+      "with": "<Text tone=\"muted\" style={{ color: \"red\" }}>"
+    }
+  ],
+  "expect": [
+    "code-hardcoded-color"
+  ]
+}

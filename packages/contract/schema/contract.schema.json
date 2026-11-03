@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kit.local/schema/contract.schema.json",
+  "title": "ContractMetadata",
+  "description": "design/contract/contract.json: metadata for a design contract. Its schemaVersion covers every file in the contract folder.",
+  "type": "object",
+  "required": ["schemaVersion", "name", "version", "sources"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "$ref": "common.schema.json#/$defs/schemaVersion" },
+    "name": {
+      "description": "Product the contract describes.",
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "description": "Version of this contract (semver).",
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?$",
+      "x-hint": "Versions look like \"1.0.0\"."
+    },
+    "description": { "type": "string" },
+    "sources": {
+      "description": "Where the contract's content came from.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/source" }
+    }
+  },
+  "$defs": {
+    "source": {
+      "title": "ContractSource",
+      "type": "object",
+      "required": ["kind", "ref"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["code", "figma", "docs", "manual"]
+        },
+        "ref": {
+          "description": "Repo path, Figma file, document name, or a note for hand-written contracts.",
+          "type": "string",
+          "minLength": 1
+        },
+        "importedAt": { "$ref": "common.schema.json#/$defs/timestamp" }
+      }
+    }
+  }
+}

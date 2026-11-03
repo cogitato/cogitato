@@ -1,0 +1,12 @@
+{
+  "name": "cogitato",
+  "owner": { "name": "Cogitato" },
+  "description": "Cogitato's Claude Code plugin for designers building coded prototypes.",
+  "plugins": [
+    {
+      "name": "cogitato",
+      "source": "./plugin",
+      "description": "Build coded prototypes from plain-language prompts, kept to your team's design system."
+    }
+  ]
+}

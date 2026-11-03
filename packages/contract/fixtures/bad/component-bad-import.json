@@ -1,0 +1,13 @@
+{
+  "description": "Component imported from outside the kit",
+  "ops": [
+    {
+      "op": "set",
+      "at": "contract/components/button.json#/import",
+      "value": "../ui/Button"
+    }
+  ],
+  "expect": [
+    "schema-pattern"
+  ]
+}

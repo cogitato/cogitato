@@ -1,0 +1,12 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font: var(--kit-typography-body);
+  color: var(--kit-color-text-default);
+  background: var(--kit-color-surface-subtle);
+}

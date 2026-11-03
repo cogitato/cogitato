@@ -1,0 +1,14 @@
+{
+  "description": "Screen id built in code",
+  "ops": [
+    {
+      "op": "replace",
+      "file": "src/screens/cart/screen.tsx",
+      "find": "id: \"cart\",",
+      "with": "id: [\"ca\", \"rt\"].join(\"\"),"
+    }
+  ],
+  "expect": [
+    "code-screen-not-static"
+  ]
+}

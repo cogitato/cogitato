@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "kit": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/kit-mcp.mjs"],
+      "env": { "KIT_PROJECT": "${CLAUDE_PROJECT_DIR}" }
+    }
+  }
+}

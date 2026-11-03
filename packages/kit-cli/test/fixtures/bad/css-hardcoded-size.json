@@ -1,0 +1,14 @@
+{
+  "description": "Padding in pixels instead of space tokens",
+  "ops": [
+    {
+      "op": "replace",
+      "file": "src/components/Page.module.css",
+      "find": "padding: var(--kit-space-8) var(--kit-space-4);",
+      "with": "padding: 30px 16px;"
+    }
+  ],
+  "expect": [
+    "code-hardcoded-size"
+  ]
+}

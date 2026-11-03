@@ -1,0 +1,18 @@
+{
+  "description": "Two aliases that point at each other",
+  "ops": [
+    {
+      "op": "set",
+      "at": "contract/tokens.json#/color/surface/default/$value",
+      "value": "{color.surface.subtle}"
+    },
+    {
+      "op": "set",
+      "at": "contract/tokens.json#/color/surface/subtle/$value",
+      "value": "{color.surface.default}"
+    }
+  ],
+  "expect": [
+    "token-alias-cycle"
+  ]
+}

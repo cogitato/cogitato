@@ -1,0 +1,16 @@
+{
+  "description": "Arrow from a state that isn't in the flow",
+  "ops": [
+    {
+      "op": "set",
+      "at": "flows.json#/flows/0/edges/6",
+      "value": {
+        "from": "cart.empty",
+        "to": "cart.default"
+      }
+    }
+  ],
+  "expect": [
+    "flows-edge-outside-flow"
+  ]
+}

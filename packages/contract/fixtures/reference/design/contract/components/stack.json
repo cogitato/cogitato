@@ -1,0 +1,16 @@
+{
+  "$schema": "../../../../../schema/component.schema.json",
+  "name": "Stack",
+  "description": "Lays out children in a row or column with token spacing. Use instead of custom margins.",
+  "source": "generated",
+  "confidence": "low",
+  "import": "@/kit/Stack",
+  "props": {
+    "direction": { "type": "enum", "values": ["row", "column"], "default": "column" },
+    "gap": { "type": "enum", "values": ["0", "1", "2", "3", "4", "6", "8"], "default": "4", "description": "Step on the space scale." },
+    "align": { "type": "enum", "values": ["start", "center", "end", "stretch"], "default": "stretch" },
+    "children": { "type": "node", "required": true }
+  },
+  "states": ["default"],
+  "rules": ["Use gap for spacing between items; don't add margins to children."]
+}

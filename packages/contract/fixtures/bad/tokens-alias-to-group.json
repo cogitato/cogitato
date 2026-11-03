@@ -1,0 +1,13 @@
+{
+  "description": "Alias to a group instead of a token",
+  "ops": [
+    {
+      "op": "set",
+      "at": "contract/tokens.json#/color/text/muted/$value",
+      "value": "{color.neutral}"
+    }
+  ],
+  "expect": [
+    "token-broken-alias"
+  ]
+}

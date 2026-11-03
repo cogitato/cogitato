@@ -1,0 +1,30 @@
+{
+  "description": "Cogitato: check every prototype edit against the design contract, and check the machine at session start.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/kit-hook.mjs", "post-edit"],
+            "timeout": 60
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/kit-hook.mjs", "session-start"],
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

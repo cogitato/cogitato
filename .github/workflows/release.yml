@@ -1,0 +1,67 @@
+name: Release
+
+# On main: open or update the "Version packages" PR from pending changesets. Merging that PR
+# publishes every changed package to npm, with provenance. The canary job publishes a snapshot
+# of main for the platform repo to test against (ADR 016).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      canary:
+        description: Publish a canary snapshot of this commit
+        type: boolean
+        default: false
+
+concurrency: release-${{ github.ref }}
+
+jobs:
+  release:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - uses: changesets/action@v2
+        with:
+          version-script: pnpm changeset version
+          publish-script: pnpm changeset publish
+          commit-message: Version packages
+          pr-title: Version packages
+        env:
+          NPM_CONFIG_PROVENANCE: "true"
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  canary:
+    if: github.event_name == 'workflow_dispatch' && inputs.canary
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm changeset version --snapshot canary
+      - run: pnpm build
+      - run: pnpm changeset publish --tag canary --git-tag false
+        env:
+          NPM_CONFIG_PROVENANCE: "true"
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

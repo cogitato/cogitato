@@ -1,0 +1,72 @@
+{
+  "$schema": "../../../../../schema/spec.schema.json",
+  "schemaVersion": 1,
+  "initiative": "checkout-v1",
+  "title": "Checkout v1",
+  "commit": "a1b2c3d",
+  "createdAt": "2026-11-01T12:00:00Z",
+  "canvasBaseUrl": "https://canvas.example.test/acme-shop/",
+  "intent": {
+    "summary": "Let shoppers pay in one pass and recover from a declined card without losing their cart.",
+    "goals": ["Fewer abandoned checkouts after a declined card", "Shipping and payment on separate, short screens"]
+  },
+  "flowMap": {
+    "flows": ["checkout"],
+    "states": [
+      { "node": "cart.default", "title": "Two items", "canvasUrl": "checkout#cart.default" },
+      { "node": "checkout.shipping.default", "title": "Empty form", "canvasUrl": "checkout#checkout.shipping.default" },
+      { "node": "checkout.shipping.invalid-address", "title": "Address not found", "canvasUrl": "checkout#checkout.shipping.invalid-address" },
+      { "node": "checkout.payment.default", "title": "Empty form", "canvasUrl": "checkout#checkout.payment.default" },
+      { "node": "checkout.payment.processing", "title": "Processing", "canvasUrl": "checkout#checkout.payment.processing" },
+      { "node": "checkout.payment.card-declined", "title": "Card declined", "canvasUrl": "checkout#checkout.payment.card-declined" },
+      { "node": "checkout.confirmation.default", "title": "Confirmed", "canvasUrl": "checkout#checkout.confirmation.default" }
+    ]
+  },
+  "componentUsage": {
+    "reused": [
+      { "name": "Button", "usedIn": ["cart", "checkout.shipping", "checkout.payment"] },
+      { "name": "Input", "usedIn": ["checkout.shipping", "checkout.payment"] },
+      { "name": "Text", "usedIn": ["cart", "checkout.shipping", "checkout.payment", "checkout.confirmation"] },
+      { "name": "Stack", "usedIn": ["cart", "checkout.shipping", "checkout.payment", "checkout.confirmation"] }
+    ],
+    "modified": [
+      { "name": "Banner", "usedIn": ["checkout.payment"], "changes": ["Adds an action link inside danger banners"] }
+    ],
+    "new": [
+      { "name": "Stepper", "usedIn": ["checkout.shipping", "checkout.payment"], "reason": "Checkout progress indicator (gap_stepper)" }
+    ]
+  },
+  "dataAndBehavior": [
+    { "screen": "checkout.payment", "description": "Submitting shows Processing, then either Confirmed or Card declined. The prototype picks the result from the fixture." },
+    { "screen": "checkout.shipping", "description": "Address lookup is mocked; the invalid-address fixture simulates a failed lookup." }
+  ],
+  "resolvedAnnotations": [
+    {
+      "annotationId": "ann_123",
+      "type": "intent",
+      "node": "checkout.payment.card-declined",
+      "kitId": "checkout.payment.error-banner",
+      "body": "Error copy should say what to do next, not just what went wrong."
+    },
+    {
+      "annotationId": "ann_124",
+      "type": "question",
+      "node": "checkout.payment.default",
+      "kitId": "checkout.payment.submit",
+      "body": "Should Pay now be disabled until the card number is valid?",
+      "resolution": "No. Keep it enabled and show inline errors on submit."
+    }
+  ],
+  "openQuestions": [
+    { "question": "Do we retry the payment automatically once before showing Card declined?", "owner": "dev_alex" }
+  ],
+  "acceptanceCriteria": [
+    "A declined card returns the shopper to the payment form with their cart and shipping details intact.",
+    "The declined-card banner tells the shopper what to try next.",
+    "Pay now stays enabled; invalid fields show inline errors on submit."
+  ],
+  "trustBoundary": {
+    "trustworthy": ["Layout", "Component composition", "Copy", "State inventory"],
+    "notTrustworthy": ["Data handling", "Validation logic", "Payment integration", "Error handling beyond what the fixtures show"]
+  }
+}

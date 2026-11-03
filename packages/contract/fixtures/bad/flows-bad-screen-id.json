@@ -1,0 +1,13 @@
+{
+  "description": "Screen id with capitals",
+  "ops": [
+    {
+      "op": "set",
+      "at": "flows.json#/screens/0/id",
+      "value": "Cart"
+    }
+  ],
+  "expect": [
+    "schema-pattern"
+  ]
+}

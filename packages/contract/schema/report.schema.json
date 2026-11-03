@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kit.local/schema/report.schema.json",
+  "title": "ValidationReport",
+  "description": "Output of `kit validate --json` (and every Cogitato validator). Read by hooks and the kit MCP server.",
+  "type": "object",
+  "required": ["schemaVersion", "ok", "issues"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "$ref": "common.schema.json#/$defs/schemaVersion" },
+    "ok": {
+      "description": "True when there are no error-severity issues. Warnings don't fail validation.",
+      "type": "boolean"
+    },
+    "issues": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/issue" }
+    }
+  },
+  "$defs": {
+    "issue": {
+      "title": "Issue",
+      "description": "One problem found by a validator.",
+      "type": "object",
+      "required": ["code", "severity", "file", "path", "message"],
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "description": "Stable machine-readable code, e.g. \"schema-required\" or \"code-hardcoded-color\".",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-zA-Z0-9]+)*$"
+        },
+        "severity": { "$ref": "#/$defs/severity" },
+        "file": {
+          "description": "File the issue is in, relative to the folder being validated, with \"/\" separators.",
+          "type": "string"
+        },
+        "path": {
+          "description": "JSON pointer to the value inside a JSON file; \"\" for the whole file or for source files.",
+          "type": "string"
+        },
+        "line": {
+          "description": "1-based line in a source file.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "column": {
+          "description": "1-based column in a source file.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "message": {
+          "description": "Plain-language explanation a non-technical designer can act on.",
+          "type": "string",
+          "minLength": 1
+        },
+        "suggestion": {
+          "description": "Machine-applicable replacement, e.g. \"var(--kit-color-brand-600)\".",
+          "type": "string"
+        }
+      }
+    },
+    "severity": {
+      "title": "Severity",
+      "type": "string",
+      "enum": ["error", "warning"]
+    }
+  }
+}

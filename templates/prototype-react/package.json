@@ -1,0 +1,32 @@
+{
+  "name": "@cogitato/template-prototype-react",
+  "private": true,
+  "license": "Apache-2.0",
+  "version": "0.1.0",
+  "description": "Cogitato prototype template (React + TypeScript + Vite), shipped with the Acme Shop reference kit and checkout flow",
+  "type": "module",
+  "scripts": {
+    "dev": "kit export-flows && vite",
+    "build": "kit validate && kit export-flows && tsc --noEmit && vite build && kit snapshots",
+    "typecheck": "tsc --noEmit",
+    "validate": "kit validate",
+    "kit": "kit"
+  },
+  "dependencies": {
+    "@cogitato/runtime": "workspace:*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0"
+  },
+  "devDependencies": {
+    "@cogitato/contract": "workspace:*",
+    "@cogitato/kit-cli": "workspace:*",
+    "@cogitato/kit-mcp": "workspace:*",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "playwright": "^1.64.1",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7"
+  }
+}

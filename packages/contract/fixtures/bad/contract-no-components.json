@@ -1,0 +1,12 @@
+{
+  "description": "Components folder is gone",
+  "ops": [
+    {
+      "op": "delete",
+      "at": "contract/components"
+    }
+  ],
+  "expect": [
+    "contract-no-components"
+  ]
+}

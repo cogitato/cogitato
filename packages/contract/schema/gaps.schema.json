@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kit.local/schema/gaps.schema.json",
+  "title": "GapLog",
+  "description": "design/contract/gaps.json: things designers needed that the contract doesn't cover yet. Appended by `kit gap add` and the log_gap MCP tool.",
+  "type": "object",
+  "required": ["gaps"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "gaps": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/gap" }
+    }
+  },
+  "$defs": {
+    "gap": {
+      "title": "Gap",
+      "type": "object",
+      "required": ["id", "kind", "name", "context", "status", "createdAt"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^gap_[a-z0-9_-]+$",
+          "x-hint": "Gap ids start with \"gap_\", like \"gap_stepper\"."
+        },
+        "kind": { "type": "string", "enum": ["component", "token", "pattern"] },
+        "name": {
+          "description": "What's missing, e.g. \"Stepper\" or \"color.feedback.warning-subtle\".",
+          "type": "string",
+          "minLength": 1
+        },
+        "context": {
+          "description": "What the designer was trying to do when they hit the gap.",
+          "type": "string",
+          "minLength": 1
+        },
+        "screen": { "$ref": "common.schema.json#/$defs/screenId" },
+        "workaround": {
+          "description": "What was used instead in the meantime.",
+          "type": "string"
+        },
+        "requestedBy": { "type": "string" },
+        "status": { "type": "string", "enum": ["open", "resolved", "wont-fix"] },
+        "createdAt": { "$ref": "common.schema.json#/$defs/timestamp" }
+      }
+    }
+  }
+}

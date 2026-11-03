@@ -1,0 +1,13 @@
+{
+  "description": "Spec with no acceptance criteria",
+  "ops": [
+    {
+      "op": "set",
+      "at": "handoff/checkout-v1/spec.json#/acceptanceCriteria",
+      "value": []
+    }
+  ],
+  "expect": [
+    "schema-minItems"
+  ]
+}

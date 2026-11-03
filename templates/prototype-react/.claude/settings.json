@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "extraKnownMarketplaces": {
+    "cogitato": {
+      "source": {
+        "source": "github",
+        "repo": "JaffeJoseph/cogitato",
+        "sparsePaths": [".claude-plugin", "plugin"]
+      },
+      "autoUpdate": true
+    }
+  },
+  "enabledPlugins": {
+    "cogitato@cogitato": true
+  }
+}

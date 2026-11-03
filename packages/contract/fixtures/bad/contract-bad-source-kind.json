@@ -1,0 +1,13 @@
+{
+  "description": "Unknown source kind",
+  "ops": [
+    {
+      "op": "set",
+      "at": "contract/contract.json#/sources/0/kind",
+      "value": "sketch"
+    }
+  ],
+  "expect": [
+    "schema-enum"
+  ]
+}

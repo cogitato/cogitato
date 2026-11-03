@@ -1,0 +1,14 @@
+{
+  "description": "Importing a kit component the contract doesn't have",
+  "ops": [
+    {
+      "op": "replace",
+      "file": "src/screens/checkout/shipping/screen.tsx",
+      "find": "import { Stack } from \"@/kit/Stack\";",
+      "with": "import { Stack } from \"@/kit/Stack\";\nimport { Stepper } from \"@/kit/Stepper\";"
+    }
+  ],
+  "expect": [
+    "code-unknown-component"
+  ]
+}

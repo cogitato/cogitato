@@ -1,0 +1,13 @@
+{
+  "description": "Comment on one screen pinned to another screen's element",
+  "ops": [
+    {
+      "op": "set",
+      "at": "annotations/checkout-review.json#/annotations/0/anchor/kitId",
+      "value": "cart.checkout"
+    }
+  ],
+  "expect": [
+    "annotation-kit-id-mismatch"
+  ]
+}

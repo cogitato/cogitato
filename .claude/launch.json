@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "prototype",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@cogitato/template-prototype-react", "dev"],
+      "port": 5173
+    },
+    {
+      "name": "prototype-build",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@cogitato/template-prototype-react", "exec", "vite", "preview", "--port", "4173", "--strictPort"],
+      "port": 4173
+    }
+  ]
+}

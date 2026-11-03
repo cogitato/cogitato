@@ -1,0 +1,14 @@
+{
+  "description": "Token variable that doesn't exist",
+  "ops": [
+    {
+      "op": "replace",
+      "file": "src/kit/Button.module.css",
+      "find": "background: var(--kit-color-brand-700);",
+      "with": "background: var(--kit-color-brand-650);"
+    }
+  ],
+  "expect": [
+    "code-unknown-token"
+  ]
+}

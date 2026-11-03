@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/@cogitato/contract/schema/component.schema.json",
+  "name": "Card",
+  "description": "Groups related content on a surface.",
+  "source": "production",
+  "confidence": "medium",
+  "import": "@/kit/Card",
+  "props": {
+    "padding": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md" },
+    "elevation": { "type": "enum", "values": ["flat", "raised"], "default": "flat" },
+    "children": { "type": "node", "required": true }
+  },
+  "states": ["default"],
+  "rules": ["Don't nest cards."],
+  "mapping": {
+    "production": { "path": "src/ui/Card.tsx", "export": "Card" }
+  }
+}

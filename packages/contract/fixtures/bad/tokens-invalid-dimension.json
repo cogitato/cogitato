@@ -1,0 +1,16 @@
+{
+  "description": "Dimension in an unsupported unit",
+  "ops": [
+    {
+      "op": "set",
+      "at": "contract/tokens.json#/space/4/$value",
+      "value": {
+        "value": 16,
+        "unit": "pt"
+      }
+    }
+  ],
+  "expect": [
+    "token-invalid-value"
+  ]
+}

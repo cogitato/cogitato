@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../schema/decisions.schema.json",
+  "decisions": [
+    {
+      "id": "dec_brand-blue-600",
+      "topic": "tokens.color.brand.600",
+      "question": "Code and Figma use slightly different values for the main brand blue. Which is canonical?",
+      "options": [
+        {
+          "id": "code",
+          "label": "Keep the production value",
+          "value": "#2563eb",
+          "evidence": [{ "source": "code", "detail": "src/ui/theme.ts: brand600, used in 214 places" }]
+        },
+        {
+          "id": "figma",
+          "label": "Use the Figma value",
+          "value": "#2462e8",
+          "evidence": [{ "source": "figma", "detail": "Variable Brand/600 in Acme Shop Library" }]
+        }
+      ],
+      "recommendation": "code",
+      "status": "decided",
+      "choice": "code",
+      "decidedBy": "dev_alex",
+      "decidedAt": "2026-11-01T00:00:00Z",
+      "note": "Figma variable to be updated to match."
+    },
+    {
+      "id": "dec_input-name",
+      "topic": "components.Input",
+      "question": "Production calls the text field TextInput; Figma calls it Input. Which name do designers see?",
+      "options": [
+        { "id": "input", "label": "Input (Figma name)" },
+        { "id": "text-input", "label": "TextInput (production name)" }
+      ],
+      "recommendation": "input",
+      "status": "open"
+    }
+  ]
+}

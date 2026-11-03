@@ -1,0 +1,14 @@
+{
+  "description": "Two elements on one screen with the same id",
+  "ops": [
+    {
+      "op": "replace",
+      "file": "src/screens/checkout/payment/screen.tsx",
+      "find": "data-kit-id=\"checkout.payment.cvc\"",
+      "with": "data-kit-id=\"checkout.payment.expiry\""
+    }
+  ],
+  "expect": [
+    "code-duplicate-kit-id"
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kit.local/schema/tokens.schema.json",
+  "title": "DesignTokens",
+  "description": "design/contract/tokens.json: design tokens in a subset of the W3C Design Tokens Community Group (DTCG) format. Structure is checked here; token types, values and aliases are checked by the validator because DTCG types are inherited from parent groups.",
+  "$ref": "#/$defs/group",
+  "$defs": {
+    "tokenType": {
+      "title": "TokenType",
+      "type": "string",
+      "enum": ["color", "dimension", "fontFamily", "fontWeight", "duration", "number", "typography", "shadow"]
+    },
+    "group": {
+      "title": "TokenGroup",
+      "type": "object",
+      "properties": {
+        "$schema": { "type": "string" },
+        "$type": { "$ref": "#/$defs/tokenType" },
+        "$description": { "type": "string" },
+        "$extensions": { "type": "object" }
+      },
+      "patternProperties": {
+        "^[^$.{}]+$": {
+          "tsType": "unknown",
+          "if": { "type": "object", "properties": { "$value": true }, "required": ["$value"] },
+          "then": { "$ref": "#/$defs/token" },
+          "else": { "$ref": "#/$defs/group" }
+        }
+      },
+      "additionalProperties": false,
+      "x-hint": "Token and group names can't start with \"$\" or contain \".\", \"{\" or \"}\"."
+    },
+    "token": {
+      "title": "DesignToken",
+      "type": "object",
+      "required": ["$value"],
+      "additionalProperties": false,
+      "properties": {
+        "$value": {
+          "description": "The token's value, or an alias like \"{color.brand.600}\".",
+          "type": ["string", "number", "boolean", "object", "array"]
+        },
+        "$type": { "$ref": "#/$defs/tokenType" },
+        "$description": { "type": "string" },
+        "$deprecated": { "type": ["boolean", "string"] },
+        "$extensions": { "type": "object" }
+      }
+    }
+  }
+}

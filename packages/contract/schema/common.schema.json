@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kit.local/schema/common.schema.json",
+  "title": "Common",
+  "description": "Shared definitions referenced by every other Cogitato schema.",
+  "$defs": {
+    "schemaVersion": {
+      "title": "SchemaVersion",
+      "description": "Version of the file format. Bumped on breaking changes.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "slug": {
+      "title": "Slug",
+      "description": "Lowercase words joined by dashes, e.g. \"card-declined\".",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "x-hint": "Use lowercase words joined by dashes, like \"card-declined\"."
+    },
+    "screenId": {
+      "title": "ScreenId",
+      "description": "Dot-separated lowercase id of a screen, e.g. \"checkout.payment\".",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*(\\.[a-z0-9]+(-[a-z0-9]+)*)*$",
+      "x-hint": "Screen ids are lowercase words separated by dots, like \"checkout.payment\"."
+    },
+    "kitId": {
+      "title": "KitId",
+      "description": "Annotation anchor: {screenId}.{elementName}, e.g. \"checkout.payment.submit\".",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*(\\.[a-z0-9]+(-[a-z0-9]+)*)+$",
+      "x-hint": "Element ids are the screen id plus an element name, lowercase and dot-separated, like \"checkout.payment.submit\"."
+    },
+    "nodeRef": {
+      "title": "NodeRef",
+      "description": "Reference to one state of one screen: {screenId}.{stateId}, e.g. \"checkout.payment.card-declined\".",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*(\\.[a-z0-9]+(-[a-z0-9]+)*)+$",
+      "x-hint": "A flow step is a screen id plus a state id, like \"checkout.payment.card-declined\"."
+    },
+    "commit": {
+      "title": "CommitSha",
+      "description": "Git commit sha, short or full.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{7,40}$",
+      "x-hint": "This should be a git commit id: 7 to 40 characters of 0-9 and a-f."
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "description": "ISO 8601 date-time, e.g. \"2026-11-01T00:00:00Z\".",
+      "type": "string",
+      "format": "date-time",
+      "x-hint": "Dates look like \"2026-11-01T09:30:00Z\"."
+    },
+    "frameStatus": {
+      "title": "FrameStatus",
+      "description": "Review status of a frame on the canvas.",
+      "type": "string",
+      "enum": ["exploring", "in-review", "approved", "handed-off"]
+    }
+  }
+}

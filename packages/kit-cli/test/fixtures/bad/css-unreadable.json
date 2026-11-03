@@ -1,0 +1,13 @@
+{
+  "description": "Stylesheet with a syntax error",
+  "ops": [
+    {
+      "op": "write",
+      "file": "src/components/Broken.module.css",
+      "text": ".a {\n  color: var(--kit-color-text-default);\n"
+    }
+  ],
+  "expect": [
+    "code-css-unreadable"
+  ]
+}

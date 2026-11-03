@@ -1,0 +1,14 @@
+{
+  "description": "Color that's close to, but not in, the palette",
+  "ops": [
+    {
+      "op": "replace",
+      "file": "src/kit/Card.module.css",
+      "find": "background: var(--kit-color-surface-default);",
+      "with": "background: #fdfdfd;"
+    }
+  ],
+  "expect": [
+    "code-hardcoded-color"
+  ]
+}

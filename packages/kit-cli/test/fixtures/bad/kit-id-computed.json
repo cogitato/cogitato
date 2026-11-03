@@ -1,0 +1,15 @@
+{
+  "description": "Computed element id: a warning, since it can't be checked",
+  "ok": true,
+  "ops": [
+    {
+      "op": "replace",
+      "file": "src/screens/cart/screen.tsx",
+      "find": "data-kit-id=\"cart.keep-shopping\"",
+      "with": "data-kit-id={String(\"cart.keep-shopping\")}"
+    }
+  ],
+  "expect": [
+    "code-kit-id-unchecked"
+  ]
+}

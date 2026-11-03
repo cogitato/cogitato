@@ -1,0 +1,25 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`createScreen > writes a screen that validates and shows up in flows.json with its arrow 1`] = `
+"import { defineScreen } from "@cogitato/runtime";
+
+// Build this screen with components from the design kit (@/kit/...) and token variables only.
+function ReviewScreen() {
+  return (
+    <main>
+      <h1>Review order</h1>
+    </main>
+  );
+}
+
+export default defineScreen({
+  id: "checkout.review",
+  route: "/checkout/review",
+  title: "Review order",
+  fixtures: {
+    default: { title: "Default", data: {} },
+  },
+  component: ReviewScreen,
+});
+"
+`;

@@ -1,0 +1,16 @@
+{
+  "description": "Component states without default",
+  "ops": [
+    {
+      "op": "set",
+      "at": "contract/components/button.json#/states",
+      "value": [
+        "hover",
+        "focus"
+      ]
+    }
+  ],
+  "expect": [
+    "schema-contains"
+  ]
+}

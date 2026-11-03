@@ -1,0 +1,63 @@
+{
+  "$schema": "../../../../schema/annotations.schema.json",
+  "schemaVersion": 1,
+  "exportedAt": "2026-11-01T12:00:00Z",
+  "annotations": [
+    {
+      "id": "ann_123",
+      "anchor": {
+        "screen": "checkout.payment",
+        "state": "card-declined",
+        "kitId": "checkout.payment.error-banner",
+        "commit": "a1b2c3d",
+        "fallbackRect": { "x": 0.1, "y": 0.2, "w": 0.8, "h": 0.1 }
+      },
+      "type": "intent",
+      "status": "open",
+      "author": "designer_sam",
+      "body": "Error copy should say what to do next, not just what went wrong.",
+      "replies": [],
+      "createdAt": "2026-11-01T00:00:00Z"
+    },
+    {
+      "id": "ann_124",
+      "anchor": {
+        "screen": "checkout.payment",
+        "state": "default",
+        "kitId": "checkout.payment.submit",
+        "commit": "a1b2c3d",
+        "fallbackRect": { "x": 0.1, "y": 0.8, "w": 0.8, "h": 0.06 }
+      },
+      "type": "question",
+      "status": "resolved",
+      "author": "dev_alex",
+      "body": "Should Pay now be disabled until the card number is valid?",
+      "replies": [
+        {
+          "id": "rep_1",
+          "author": "designer_sam",
+          "body": "No. Keep it enabled and show inline errors on submit.",
+          "createdAt": "2026-11-01T01:00:00Z"
+        }
+      ],
+      "createdAt": "2026-11-01T00:30:00Z",
+      "resolvedAt": "2026-11-01T01:00:00Z"
+    },
+    {
+      "id": "ann_125",
+      "anchor": {
+        "screen": "cart",
+        "state": "default",
+        "kitId": "cart.checkout",
+        "commit": "a1b2c3d",
+        "fallbackRect": { "x": 0.6, "y": 0.85, "w": 0.3, "h": 0.06 }
+      },
+      "type": "feedback",
+      "status": "archived",
+      "author": "pm_riley",
+      "body": "Love this.",
+      "replies": [],
+      "createdAt": "2026-11-01T02:00:00Z"
+    }
+  ]
+}

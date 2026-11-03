@@ -1,0 +1,15 @@
+{
+  "description": "State title changed without re-exporting flows.json: a warning",
+  "ok": true,
+  "ops": [
+    {
+      "op": "replace",
+      "file": "src/screens/checkout/payment/screen.tsx",
+      "find": "title: \"Card declined\"",
+      "with": "title: \"Card was declined\""
+    }
+  ],
+  "expect": [
+    "code-flows-stale"
+  ]
+}

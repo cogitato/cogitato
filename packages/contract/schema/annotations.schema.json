@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kit.local/schema/annotations.schema.json",
+  "title": "AnnotationExport",
+  "description": "design/annotations/{name}.json: annotations exported from the comment service. Live comments stay in the service; this is the file form used at handoff.",
+  "type": "object",
+  "required": ["schemaVersion", "exportedAt", "annotations"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "$ref": "common.schema.json#/$defs/schemaVersion" },
+    "exportedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "annotations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/annotation" }
+    }
+  },
+  "$defs": {
+    "annotation": {
+      "title": "Annotation",
+      "type": "object",
+      "required": ["id", "anchor", "type", "status", "author", "body", "replies", "createdAt"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^ann_[A-Za-z0-9_-]+$",
+          "x-hint": "Annotation ids start with \"ann_\"."
+        },
+        "anchor": { "$ref": "#/$defs/anchor" },
+        "type": { "type": "string", "enum": ["intent", "spec", "question", "feedback"] },
+        "status": { "type": "string", "enum": ["open", "resolved", "archived"] },
+        "author": { "type": "string", "minLength": 1 },
+        "body": { "type": "string", "minLength": 1 },
+        "replies": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/reply" }
+        },
+        "createdAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+        "resolvedAt": { "$ref": "common.schema.json#/$defs/timestamp" }
+      }
+    },
+    "anchor": {
+      "title": "AnnotationAnchor",
+      "description": "Where a comment is pinned: screen + state + element + commit. fallbackRect keeps it placeable if the element disappears (shown as \"detached\").",
+      "type": "object",
+      "required": ["screen", "state", "commit", "fallbackRect"],
+      "additionalProperties": false,
+      "properties": {
+        "screen": { "$ref": "common.schema.json#/$defs/screenId" },
+        "state": { "$ref": "common.schema.json#/$defs/slug" },
+        "kitId": { "$ref": "common.schema.json#/$defs/kitId" },
+        "commit": { "$ref": "common.schema.json#/$defs/commit" },
+        "fallbackRect": { "$ref": "#/$defs/rect" }
+      }
+    },
+    "rect": {
+      "title": "RelativeRect",
+      "description": "Rectangle in coordinates relative to the frame (0 to 1).",
+      "type": "object",
+      "required": ["x", "y", "w", "h"],
+      "additionalProperties": false,
+      "properties": {
+        "x": { "type": "number", "minimum": 0, "maximum": 1 },
+        "y": { "type": "number", "minimum": 0, "maximum": 1 },
+        "w": { "type": "number", "minimum": 0, "maximum": 1 },
+        "h": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "reply": {
+      "title": "AnnotationReply",
+      "type": "object",
+      "required": ["id", "author", "body", "createdAt"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "author": { "type": "string", "minLength": 1 },
+        "body": { "type": "string", "minLength": 1 },
+        "createdAt": { "$ref": "common.schema.json#/$defs/timestamp" }
+      }
+    }
+  }
+}

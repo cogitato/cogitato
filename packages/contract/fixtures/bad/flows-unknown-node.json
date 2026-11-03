@@ -1,0 +1,13 @@
+{
+  "description": "Flow step that refers to a missing state",
+  "ops": [
+    {
+      "op": "set",
+      "at": "flows.json#/flows/0/nodes/7",
+      "value": "checkout.payment.expired"
+    }
+  ],
+  "expect": [
+    "flows-unknown-node"
+  ]
+}

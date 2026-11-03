@@ -1,0 +1,14 @@
+{
+  "description": "Element id that starts with another screen's id",
+  "ops": [
+    {
+      "op": "replace",
+      "file": "src/screens/cart/screen.tsx",
+      "find": "data-kit-id=\"cart.checkout\"",
+      "with": "data-kit-id=\"checkout.go\""
+    }
+  ],
+  "expect": [
+    "code-invalid-kit-id"
+  ]
+}

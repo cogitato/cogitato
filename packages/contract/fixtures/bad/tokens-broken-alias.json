@@ -1,0 +1,13 @@
+{
+  "description": "Alias to a token that doesn't exist",
+  "ops": [
+    {
+      "op": "set",
+      "at": "contract/tokens.json#/color/text/default/$value",
+      "value": "{color.neutral.950}"
+    }
+  ],
+  "expect": [
+    "token-broken-alias"
+  ]
+}

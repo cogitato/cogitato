@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kit.local/schema/spec.schema.json",
+  "title": "HandoffSpec",
+  "description": "design/handoff/{initiative}/spec.json: the machine-readable handoff spec read by implement-handoff. spec.md is its human-readable twin.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "initiative",
+    "title",
+    "commit",
+    "createdAt",
+    "intent",
+    "flowMap",
+    "componentUsage",
+    "dataAndBehavior",
+    "resolvedAnnotations",
+    "openQuestions",
+    "acceptanceCriteria",
+    "trustBoundary"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "$ref": "common.schema.json#/$defs/schemaVersion" },
+    "initiative": { "$ref": "common.schema.json#/$defs/slug" },
+    "title": { "type": "string", "minLength": 1 },
+    "commit": { "$ref": "common.schema.json#/$defs/commit" },
+    "createdAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "canvasBaseUrl": {
+      "description": "Canvas URL the state links are relative to.",
+      "type": "string",
+      "format": "uri"
+    },
+    "intent": {
+      "description": "§1 Intent: what this initiative is for.",
+      "type": "object",
+      "required": ["summary"],
+      "additionalProperties": false,
+      "properties": {
+        "summary": { "type": "string", "minLength": 1 },
+        "goals": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "flowMap": {
+      "description": "§2 Flow map and state inventory.",
+      "type": "object",
+      "required": ["flows", "states"],
+      "additionalProperties": false,
+      "properties": {
+        "flows": {
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/slug" }
+        },
+        "states": {
+          "type": "array",
+          "items": {
+            "title": "SpecState",
+            "type": "object",
+            "required": ["node", "title"],
+            "additionalProperties": false,
+            "properties": {
+              "node": { "$ref": "common.schema.json#/$defs/nodeRef" },
+              "title": { "type": "string" },
+              "canvasUrl": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "componentUsage": {
+      "description": "§3 Component usage, from the contract plus a code scan.",
+      "type": "object",
+      "required": ["reused", "modified", "new"],
+      "additionalProperties": false,
+      "properties": {
+        "reused": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/usage" }
+        },
+        "modified": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/modifiedUsage" }
+        },
+        "new": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/newUsage" }
+        }
+      }
+    },
+    "dataAndBehavior": {
+      "description": "§4 Data and behavior the prototype mocks.",
+      "type": "array",
+      "items": {
+        "title": "BehaviorNote",
+        "type": "object",
+        "required": ["description"],
+        "additionalProperties": false,
+        "properties": {
+          "screen": { "$ref": "common.schema.json#/$defs/screenId" },
+          "description": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "resolvedAnnotations": {
+      "description": "§5 Intent and spec annotations, plus resolved questions.",
+      "type": "array",
+      "items": {
+        "title": "ResolvedAnnotation",
+        "type": "object",
+        "required": ["annotationId", "type", "node", "body"],
+        "additionalProperties": false,
+        "properties": {
+          "annotationId": { "type": "string", "pattern": "^ann_" },
+          "type": { "type": "string", "enum": ["intent", "spec", "question"] },
+          "node": { "$ref": "common.schema.json#/$defs/nodeRef" },
+          "kitId": { "$ref": "common.schema.json#/$defs/kitId" },
+          "body": { "type": "string", "minLength": 1 },
+          "resolution": { "type": "string" }
+        }
+      }
+    },
+    "openQuestions": {
+      "description": "§6 Questions still open at handoff.",
+      "type": "array",
+      "items": {
+        "title": "OpenQuestion",
+        "type": "object",
+        "required": ["question"],
+        "additionalProperties": false,
+        "properties": {
+          "question": { "type": "string", "minLength": 1 },
+          "annotationId": { "type": "string", "pattern": "^ann_" },
+          "owner": { "type": "string" }
+        }
+      }
+    },
+    "acceptanceCriteria": {
+      "description": "§7 Acceptance criteria.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 },
+      "x-hint": "A handoff needs at least one acceptance criterion."
+    },
+    "trustBoundary": {
+      "description": "§8 What developers can and can't take from the prototype.",
+      "type": "object",
+      "required": ["trustworthy", "notTrustworthy"],
+      "additionalProperties": false,
+      "properties": {
+        "trustworthy": { "type": "array", "items": { "type": "string" } },
+        "notTrustworthy": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  "$defs": {
+    "componentName": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Za-z0-9]*$",
+      "x-hint": "Component names start with a capital letter and use no spaces, like \"TextField\"."
+    },
+    "usedIn": {
+      "description": "Screens that use the component.",
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/screenId" }
+    },
+    "usage": {
+      "title": "ComponentUsage",
+      "type": "object",
+      "required": ["name", "usedIn"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "$ref": "#/$defs/componentName" },
+        "usedIn": { "$ref": "#/$defs/usedIn" }
+      }
+    },
+    "modifiedUsage": {
+      "title": "ModifiedComponentUsage",
+      "type": "object",
+      "required": ["name", "usedIn", "changes"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "$ref": "#/$defs/componentName" },
+        "usedIn": { "$ref": "#/$defs/usedIn" },
+        "changes": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+      }
+    },
+    "newUsage": {
+      "title": "NewComponentUsage",
+      "type": "object",
+      "required": ["name", "usedIn", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "$ref": "#/$defs/componentName" },
+        "usedIn": { "$ref": "#/$defs/usedIn" },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

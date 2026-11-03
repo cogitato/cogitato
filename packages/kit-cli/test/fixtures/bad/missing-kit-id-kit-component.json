@@ -1,0 +1,14 @@
+{
+  "description": "Kit Button (it has event props) without a data-kit-id",
+  "ops": [
+    {
+      "op": "replace",
+      "file": "src/screens/checkout/shipping/screen.tsx",
+      "find": " data-kit-id=\"checkout.shipping.back\"",
+      "with": ""
+    }
+  ],
+  "expect": [
+    "code-missing-kit-id"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "../../../../schema/contract.schema.json",
+  "schemaVersion": 1,
+  "name": "Acme Shop",
+  "version": "0.1.0",
+  "description": "Reference contract for an invented e-commerce product. Hand-written to exercise every Cogitato format before intake exists.",
+  "sources": [
+    { "kind": "manual", "ref": "Hand-written reference contract (ADR 003)" },
+    { "kind": "code", "ref": "acme/shop-web: src/ui", "importedAt": "2026-11-01T00:00:00Z" },
+    { "kind": "figma", "ref": "Acme Shop Library", "importedAt": "2026-11-01T00:00:00Z" }
+  ]
+}

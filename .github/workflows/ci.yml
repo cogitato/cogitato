@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # The template build takes snapshots for the canvas.
+      - run: pnpm --filter @cogitato/template-prototype-react exec playwright install --with-deps chromium
+      - name: Generated types are current
+        run: pnpm gen && git diff --exit-code -- packages/contract/src/generated
+      - run: pnpm build
+      - run: pnpm typecheck
+      - run: pnpm test
+      - name: Published packages contain the right files
+        run: node scripts/check-packages.mjs
+      - name: The template build didn't change committed files
+        run: git diff --exit-code -- . ':!templates/prototype-react/design/flows.json'

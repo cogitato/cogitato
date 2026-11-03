@@ -1,0 +1,14 @@
+{
+  "description": "Flow arrow to a state that doesn't exist",
+  "ops": [
+    {
+      "op": "replace",
+      "file": "src/flows.ts",
+      "find": "to: \"checkout.payment.card-declined\"",
+      "with": "to: \"checkout.payment.expired\""
+    }
+  ],
+  "expect": [
+    "code-unknown-flow-step"
+  ]
+}

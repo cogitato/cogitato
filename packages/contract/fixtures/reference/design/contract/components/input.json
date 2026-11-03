@@ -1,0 +1,27 @@
+{
+  "$schema": "../../../../../schema/component.schema.json",
+  "name": "Input",
+  "description": "Single-line text field with a label, hint and error message.",
+  "source": "production",
+  "confidence": "high",
+  "import": "@/kit/Input",
+  "props": {
+    "label": { "type": "string", "required": true },
+    "type": { "type": "enum", "values": ["text", "email", "password", "number", "tel"], "default": "text" },
+    "value": { "type": "string" },
+    "placeholder": { "type": "string" },
+    "hint": { "type": "string", "description": "Help text shown under the field." },
+    "error": { "type": "string", "description": "Error text. Setting it shows the error state." },
+    "disabled": { "type": "boolean", "default": false },
+    "onChange": { "type": "event" }
+  },
+  "states": ["default", "focus", "filled", "error", "disabled"],
+  "rules": [
+    "Always set a label, even if it is visually hidden.",
+    "Error messages say how to fix the problem."
+  ],
+  "mapping": {
+    "production": { "path": "src/ui/forms/TextInput.tsx", "export": "TextInput" },
+    "figma": { "componentKey": "b7e2d9a14c60" }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "description": "rules.md deleted",
+  "ops": [
+    {
+      "op": "delete",
+      "at": "contract/rules.md"
+    }
+  ],
+  "expect": [
+    "file-missing"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "description": "Decision choice that isn't an option",
+  "ops": [
+    {
+      "op": "set",
+      "at": "contract/decisions.json#/decisions/0/choice",
+      "value": "design"
+    }
+  ],
+  "expect": [
+    "decision-unknown-option"
+  ]
+}

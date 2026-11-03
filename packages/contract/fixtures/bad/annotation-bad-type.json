@@ -1,0 +1,13 @@
+{
+  "description": "Unknown annotation type",
+  "ops": [
+    {
+      "op": "set",
+      "at": "annotations/checkout-review.json#/annotations/0/type",
+      "value": "praise"
+    }
+  ],
+  "expect": [
+    "schema-enum"
+  ]
+}

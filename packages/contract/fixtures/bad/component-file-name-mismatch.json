@@ -1,0 +1,13 @@
+{
+  "description": "text.json renamed to typography.json",
+  "ops": [
+    {
+      "op": "rename",
+      "at": "contract/components/text.json",
+      "to": "contract/components/typography.json"
+    }
+  ],
+  "expect": [
+    "component-file-name-mismatch"
+  ]
+}

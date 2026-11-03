@@ -1,0 +1,13 @@
+{
+  "description": "kitId written as a sentence",
+  "ops": [
+    {
+      "op": "set",
+      "at": "annotations/checkout-review.json#/annotations/0/anchor/kitId",
+      "value": "Checkout Payment Banner"
+    }
+  ],
+  "expect": [
+    "schema-pattern"
+  ]
+}

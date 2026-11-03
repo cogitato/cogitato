@@ -1,0 +1,14 @@
+{
+  "description": "Palette color typed as hex in a CSS module",
+  "ops": [
+    {
+      "op": "replace",
+      "file": "src/kit/Button.module.css",
+      "find": ".primary {\n  background: var(--kit-color-brand-600);",
+      "with": ".primary {\n  background: #2563eb;"
+    }
+  ],
+  "expect": [
+    "code-hardcoded-color"
+  ]
+}

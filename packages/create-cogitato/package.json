@@ -1,0 +1,41 @@
+{
+  "name": "create-cogitato",
+  "version": "0.1.0",
+  "description": "Start a new Cogitato prototype: `npm create cogitato@latest my-prototype`",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JaffeJoseph/cogitato.git",
+    "directory": "packages/create-cogitato"
+  },
+  "homepage": "https://github.com/JaffeJoseph/cogitato/tree/main/packages/create-cogitato#readme",
+  "bugs": "https://github.com/JaffeJoseph/cogitato/issues",
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module",
+  "main": "./dist/create.js",
+  "types": "./dist/create.d.ts",
+  "bin": {
+    "create-cogitato": "./bin/create-cogitato.js"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "template"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && node scripts/bundle-template.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2",
+    "vitest": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

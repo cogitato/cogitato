@@ -1,0 +1,22 @@
+{
+  "$schema": "../../../node_modules/@cogitato/contract/schema/component.schema.json",
+  "name": "Banner",
+  "description": "Inline message about the state of a page or form.",
+  "source": "figma",
+  "confidence": "medium",
+  "import": "@/kit/Banner",
+  "props": {
+    "tone": { "type": "enum", "values": ["info", "success", "warning", "danger"], "default": "info" },
+    "title": { "type": "string" },
+    "children": { "type": "node", "required": true },
+    "onDismiss": { "type": "event", "description": "Shows a close button when set." }
+  },
+  "states": ["default"],
+  "rules": [
+    "Place at the top of the content it refers to.",
+    "Danger banners say what to do next, not just what went wrong."
+  ],
+  "mapping": {
+    "figma": { "componentKey": "c3d8f1a07e25", "nodeId": "1204:388" }
+  }
+}

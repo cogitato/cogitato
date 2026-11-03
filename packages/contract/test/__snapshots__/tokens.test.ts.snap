@@ -1,0 +1,72 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`tokensToCss > writes every token, keeping aliases as var() references 1`] = `
+"/* Generated from tokens.json by @cogitato/contract. Do not edit. */
+:root {
+  --kit-color-brand-50: #eff6ff;
+  --kit-color-brand-100: #dbeafe;
+  --kit-color-brand-500: #3b82f6;
+  --kit-color-brand-600: #2563eb;
+  --kit-color-brand-700: #1d4ed8;
+  --kit-color-neutral-0: #ffffff;
+  --kit-color-neutral-50: #f8fafc;
+  --kit-color-neutral-100: #f1f5f9;
+  --kit-color-neutral-200: #e2e8f0;
+  --kit-color-neutral-500: #64748b;
+  --kit-color-neutral-700: #334155;
+  --kit-color-neutral-900: #0f172a;
+  --kit-color-feedback-success: #15803d;
+  --kit-color-feedback-warning: #b45309;
+  --kit-color-feedback-danger: #b91c1c;
+  --kit-color-feedback-danger-subtle: #fef2f2;
+  --kit-color-feedback-info: var(--kit-color-brand-600);
+  --kit-color-text-default: var(--kit-color-neutral-900);
+  --kit-color-text-muted: var(--kit-color-neutral-500);
+  --kit-color-text-inverse: var(--kit-color-neutral-0);
+  --kit-color-text-danger: var(--kit-color-feedback-danger);
+  --kit-color-surface-default: var(--kit-color-neutral-0);
+  --kit-color-surface-subtle: var(--kit-color-neutral-50);
+  --kit-color-border-default: var(--kit-color-neutral-200);
+  --kit-color-border-focus: var(--kit-color-brand-500);
+  --kit-space-0: 0px;
+  --kit-space-1: 4px;
+  --kit-space-2: 8px;
+  --kit-space-3: 12px;
+  --kit-space-4: 16px;
+  --kit-space-6: 24px;
+  --kit-space-8: 32px;
+  --kit-radius-sm: 4px;
+  --kit-radius-md: 8px;
+  --kit-radius-lg: 12px;
+  --kit-radius-full: 9999px;
+  --kit-font-family-sans: Inter, system-ui, sans-serif;
+  --kit-font-weight-regular: 400;
+  --kit-font-weight-medium: 500;
+  --kit-font-weight-semibold: 600;
+  --kit-font-weight-bold: 700;
+  --kit-font-size-sm: 14px;
+  --kit-font-size-md: 16px;
+  --kit-font-size-lg: 20px;
+  --kit-font-size-xl: 28px;
+  --kit-typography-body-font-family: var(--kit-font-family-sans);
+  --kit-typography-body-font-size: var(--kit-font-size-md);
+  --kit-typography-body-font-weight: var(--kit-font-weight-regular);
+  --kit-typography-body-line-height: 1.5;
+  --kit-typography-body: var(--kit-typography-body-font-weight) var(--kit-typography-body-font-size)/var(--kit-typography-body-line-height) var(--kit-typography-body-font-family);
+  --kit-typography-label-font-family: var(--kit-font-family-sans);
+  --kit-typography-label-font-size: var(--kit-font-size-sm);
+  --kit-typography-label-font-weight: var(--kit-font-weight-medium);
+  --kit-typography-label-line-height: 1.4;
+  --kit-typography-label: var(--kit-typography-label-font-weight) var(--kit-typography-label-font-size)/var(--kit-typography-label-line-height) var(--kit-typography-label-font-family);
+  --kit-typography-heading-font-family: var(--kit-font-family-sans);
+  --kit-typography-heading-font-size: var(--kit-font-size-xl);
+  --kit-typography-heading-font-weight: var(--kit-font-weight-bold);
+  --kit-typography-heading-line-height: 1.2;
+  --kit-typography-heading-letter-spacing: -0.02rem;
+  --kit-typography-heading: var(--kit-typography-heading-font-weight) var(--kit-typography-heading-font-size)/var(--kit-typography-heading-line-height) var(--kit-typography-heading-font-family);
+  --kit-shadow-card: 0px 1px 3px 0px #0f172a1a;
+  --kit-duration-fast: 120ms;
+  --kit-duration-normal: 200ms;
+}
+"
+`;

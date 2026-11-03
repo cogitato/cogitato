@@ -1,0 +1,14 @@
+{
+  "description": "Inline style padding as a bare number (pixels)",
+  "ops": [
+    {
+      "op": "replace",
+      "file": "src/screens/cart/screen.tsx",
+      "find": "<Stack gap=\"1\" style={{ flex: 1 }}>",
+      "with": "<Stack gap=\"1\" style={{ flex: 1, padding: 16 }}>"
+    }
+  ],
+  "expect": [
+    "code-hardcoded-size"
+  ]
+}

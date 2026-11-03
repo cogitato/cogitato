@@ -1,0 +1,51 @@
+{
+  "name": "@cogitato/kit-cli",
+  "version": "0.1.0",
+  "description": "The `kit` command: validate prototypes against their design contract, export flows, preview the kit, check machine health",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JaffeJoseph/cogitato.git",
+    "directory": "packages/kit-cli"
+  },
+  "homepage": "https://github.com/JaffeJoseph/cogitato/tree/main/packages/kit-cli#readme",
+  "bugs": "https://github.com/JaffeJoseph/cogitato/issues",
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "kit": "./bin/kit.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "bin",
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@cogitato/contract": "workspace:*",
+    "mri": "^1.2.0",
+    "postcss": "^8.4.49",
+    "typescript": "^5.7.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "vitest": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

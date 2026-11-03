@@ -1,0 +1,12 @@
+{
+  "description": "Spec without the trust boundary section",
+  "ops": [
+    {
+      "op": "remove",
+      "at": "handoff/checkout-v1/spec.json#/trustBoundary"
+    }
+  ],
+  "expect": [
+    "schema-required"
+  ]
+}

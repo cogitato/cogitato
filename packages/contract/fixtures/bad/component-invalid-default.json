@@ -1,0 +1,13 @@
+{
+  "description": "Enum default that isn't one of the values",
+  "ops": [
+    {
+      "op": "set",
+      "at": "contract/components/button.json#/props/size/default",
+      "value": "xl"
+    }
+  ],
+  "expect": [
+    "component-invalid-default"
+  ]
+}

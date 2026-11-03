@@ -1,0 +1,25 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@4.0.1/schema.json",
+  "changelog": "@changesets/cli/changelog",
+  "commit": false,
+  "fixed": [
+    [
+      "@cogitato/contract",
+      "@cogitato/runtime",
+      "@cogitato/canvas",
+      "@cogitato/kit-cli",
+      "@cogitato/kit-mcp",
+      "create-cogitato"
+    ]
+  ],
+  "linked": [],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": [
+    "@cogitato/template-prototype-react"
+  ],
+  "snapshot": {
+    "prereleaseTemplate": "canary-{commit}"
+  }
+}

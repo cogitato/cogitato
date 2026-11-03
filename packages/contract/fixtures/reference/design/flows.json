@@ -1,0 +1,68 @@
+{
+  "$schema": "../../../schema/flows.schema.json",
+  "schemaVersion": 1,
+  "commit": "a1b2c3d",
+  "screens": [
+    {
+      "id": "cart",
+      "route": "/cart",
+      "title": "Cart",
+      "states": [
+        { "id": "default", "fixture": "default", "title": "Two items" },
+        { "id": "empty", "fixture": "empty", "title": "Empty cart" }
+      ]
+    },
+    {
+      "id": "checkout.shipping",
+      "route": "/checkout/shipping",
+      "title": "Shipping",
+      "states": [
+        { "id": "default", "fixture": "default", "title": "Empty form" },
+        { "id": "invalid-address", "fixture": "invalid-address", "title": "Address not found" }
+      ]
+    },
+    {
+      "id": "checkout.payment",
+      "route": "/checkout/payment",
+      "title": "Payment",
+      "states": [
+        { "id": "default", "fixture": "default", "title": "Empty form" },
+        { "id": "processing", "fixture": "processing", "title": "Processing" },
+        { "id": "card-declined", "fixture": "card-declined", "title": "Card declined" }
+      ]
+    },
+    {
+      "id": "checkout.confirmation",
+      "route": "/checkout/confirmation",
+      "title": "Order confirmed",
+      "states": [{ "id": "default", "fixture": "default", "title": "Confirmed" }]
+    }
+  ],
+  "flows": [
+    {
+      "id": "checkout",
+      "title": "Checkout",
+      "nodes": [
+        "cart.default",
+        "checkout.shipping.default",
+        "checkout.shipping.invalid-address",
+        "checkout.payment.default",
+        "checkout.payment.processing",
+        "checkout.payment.card-declined",
+        "checkout.confirmation.default"
+      ],
+      "edges": [
+        { "from": "cart.default", "to": "checkout.shipping.default", "label": "Check out" },
+        { "from": "checkout.shipping.default", "to": "checkout.shipping.invalid-address", "label": "Continue, address not found" },
+        { "from": "checkout.shipping.default", "to": "checkout.payment.default", "label": "Continue" },
+        { "from": "checkout.payment.default", "to": "checkout.payment.processing", "label": "Pay now" },
+        { "from": "checkout.payment.processing", "to": "checkout.payment.card-declined", "label": "Declined" },
+        { "from": "checkout.payment.processing", "to": "checkout.confirmation.default", "label": "Approved" }
+      ]
+    }
+  ],
+  "status": {
+    "checkout.payment.default": "approved",
+    "checkout.payment.card-declined": "in-review"
+  }
+}
