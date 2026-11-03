@@ -1,12 +1,13 @@
 name: Release
 
 # On main: open or update the "Version packages" PR from pending changesets. Merging that PR
-# publishes every changed package to npm. The canary job publishes a snapshot of main for the
-# platform repo to test against (ADR 016).
+# stages every new version on npm. The canary job stages a snapshot of main for the platform repo
+# to test against (ADR 016).
 #
-# Publishing uses npm trusted publishing: npm trusts this workflow file (release.yml) in this
-# repo, GitHub's OIDC token (id-token: write) proves it's us, and provenance comes with it. There
-# is no npm token. Renaming this file breaks publishing until npm's settings are updated.
+# Nothing goes public from here. Packages are *staged*: npm holds them until a maintainer runs
+# `pnpm release:approve` (2FA). Staging uses npm trusted publishing: npm trusts this workflow
+# file (release.yml) in this repo, GitHub's OIDC token (id-token: write) proves it's us, and
+# there is no npm token. Renaming this file breaks staging until npm's settings are updated.
 
 on:
   push:
@@ -40,7 +41,7 @@ jobs:
       - uses: changesets/action@v2
         with:
           version-script: pnpm changeset version
-          publish-script: pnpm changeset publish
+          publish-script: pnpm release:stage
           commit-message: Version packages
           pr-title: Version packages
 
@@ -64,4 +65,4 @@ jobs:
           printf -- '---\n"@cogitato/contract": patch\n---\n\nCanary snapshot.\n' > .changeset/canary-snapshot.md
       - run: pnpm changeset version --snapshot canary
       - run: pnpm build
-      - run: pnpm changeset publish --tag canary --git-tag false
+      - run: pnpm release:stage --tag canary

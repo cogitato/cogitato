@@ -13,7 +13,8 @@
     "typecheck": "pnpm -r run typecheck",
     "test": "pnpm -r run test",
     "check:packages": "node scripts/check-packages.mjs",
-    "changeset": "changeset"
+    "changeset": "changeset",
+    "release:stage": "pnpm stage publish -r --no-git-checks"
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.3"
