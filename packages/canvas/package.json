@@ -1,6 +1,6 @@
 {
   "name": "@cogitato/canvas",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The Cogitato canvas: every screen state of a prototype as a live frame, laid out as its flows",
   "license": "Apache-2.0",
   "repository": {

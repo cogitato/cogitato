@@ -1,6 +1,6 @@
 {
   "name": "@cogitato/runtime",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "What every Cogitato prototype runs on: screen and flow registration, fixtures, frame mode, dev chrome, the /__kit preview and the Vite plugin",
   "license": "Apache-2.0",
   "repository": {

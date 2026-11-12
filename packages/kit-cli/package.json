@@ -1,6 +1,6 @@
 {
   "name": "@cogitato/kit-cli",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The `kit` command: validate prototypes against their design contract, export flows, preview the kit, check machine health",
   "license": "Apache-2.0",
   "repository": {
