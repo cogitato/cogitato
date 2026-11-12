@@ -1,7 +1,7 @@
 {
   "name": "@cogitato/kit-mcp",
   "version": "0.1.0",
-  "description": "Kit MCP server: gives Claude Code structured access to a prototype's design contract and scaffolding actions",
+  "description": "Kit MCP server: gives Claude Code structured access to a design workspace's contract and its prototypes' screens and states",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",

@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { tokenCssVar } from "@cogitato/contract";
@@ -19,6 +20,7 @@ import {
   resolvePrototype,
   validate,
   validateWorkspace,
+  workspaceSuccess,
   type Workspace,
   type ScaffoldResult,
 } from "@cogitato/kit-cli";
@@ -28,6 +30,9 @@ import { z } from "zod";
 // function; nothing about the contract or the rules is decided in this package.
 
 export const SERVER_NAME = "cogitato-kit";
+
+// package.json sits one folder up from both src/ and dist/.
+const { version: SERVER_VERSION } = createRequire(import.meta.url)("../package.json") as { version: string };
 
 const INSTRUCTIONS = `Tools for this Cogitato workspace's design contract (its design system) and its prototypes' screens.
 Use them instead of reading files in design/contract: list_components and get_component before using a kit component,
@@ -84,7 +89,7 @@ const prototypeArg = z.string().optional().describe("Which prototype (a folder i
 
 export function createServer(ws: Workspace): McpServer {
   const at = (name?: string) => resolvePrototype(ws, name, process.env.KIT_PROJECT);
-  const server = new McpServer({ name: SERVER_NAME, version: "0.1.0" }, { instructions: INSTRUCTIONS });
+  const server = new McpServer({ name: SERVER_NAME, version: SERVER_VERSION }, { instructions: INSTRUCTIONS });
 
   server.registerTool(
     "list_components",
@@ -213,7 +218,7 @@ export function createServer(ws: Workspace): McpServer {
   server.registerTool(
     "validate",
     {
-      title: "Check the prototype",
+      title: "Check the prototypes",
       description: "Checks a prototype against its design contract (with several prototypes and none named, checks the whole workspace) and returns plain-language problems with suggested fixes. Run it before finishing any building work.",
       inputSchema: {
         files: z.array(z.string()).optional().describe("Only check these files (relative to the prototype). Leave out to check everything."),
@@ -223,7 +228,7 @@ export function createServer(ws: Workspace): McpServer {
     },
     ({ files, prototype }) =>
       run(() => {
-        if (!files?.length && !prototype && listPrototypes(ws).length > 1) return text(formatResult(validateWorkspace(ws)));
+        if (!files?.length && !prototype && listPrototypes(ws).length !== 1) return text(formatResult(validateWorkspace(ws), workspaceSuccess(ws)));
         return text(formatResult(validate(at(prototype), files?.length ? { files } : {})));
       }),
   );
@@ -268,7 +273,7 @@ export function createServer(ws: Workspace): McpServer {
     {
       title: "Save a version",
       description:
-        "Saves the designer's work as a version: commits everything on their design branch and shares it if the prototype has a shared copy. Only use when the person asks to save.",
+        "Saves the designer's work as a version: commits everything on their design branch and shares it if the workspace has a shared copy. Only use when the person asks to save.",
       inputSchema: { message: z.string().optional().describe("Short description of the version; generated from the changes if left out.") },
     },
     ({ message }) =>

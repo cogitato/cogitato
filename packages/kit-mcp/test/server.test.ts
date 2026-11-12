@@ -156,3 +156,20 @@ describe("a workspace with several prototypes", () => {
     }
   });
 });
+
+describe("server details", () => {
+  it("reports this package's version and plain tool titles", async () => {
+    const pkg = JSON.parse(readFileSync(fileURLToPath(new URL("../package.json", import.meta.url)), "utf8")) as { version: string };
+    expect(client.getServerVersion()?.version).toBe(pkg.version);
+    const { tools } = await client.listTools();
+    expect(tools.find((t) => t.name === "validate")?.title).toBe("Check the prototypes");
+    expect(tools.find((t) => t.name === "save_version")?.description).toContain("shares it if the workspace has a shared copy");
+  });
+
+  it("checks the contract and kit of a workspace with no prototypes yet", async () => {
+    rmSync(join(root, "prototypes", "checkout"), { recursive: true, force: true });
+    const r = await call("validate");
+    expect(r.isError).toBe(false);
+    expect(r.text).toMatch(/no prototypes yet/);
+  });
+});
