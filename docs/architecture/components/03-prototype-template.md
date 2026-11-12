@@ -3,10 +3,11 @@
 **Location:** `templates/workspace-react`  ·  **Phase:** 1
 
 ## Responsibility
-The app designers actually build in. Cloned into each prototype repo by intake.
+The design workspace designers actually build in. `npm create cogitato` makes a workspace with one prototype in `prototypes/checkout/`; `kit new-prototype <name>` (or asking Claude) adds more.
 
 ## Contents
-- App shell, router, and a `src/kit/` folder of contract components (real imports, wrappers, or generated)
+- A shared root `kit/` of coded kit components (imported as `@/kit/...`) and `design/contract/`, used by every prototype
+- Per prototype (`prototypes/<name>/`): app shell, router and `src/` screens, plus its own `design/flows.json` and `package.json`
 - Token CSS generated from `tokens.json`
 - **Fixture system:** each screen registers named fixtures (mock data + initial UI state). `?fixture=name` loads one.
 - **Frame mode:** `?kit-frame=1` hides dev chrome and enables the annotation bridge (postMessage to the canvas: element rects for `data-kit-id`, hover/click selection)

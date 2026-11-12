@@ -39,7 +39,7 @@ Everything here runs on one person's machine and is free. Team features (a share
 3. [Roadmap](docs/roadmap.md) and [decisions](docs/decisions/)
 
 ## Status
-Phases 0–3 are built: contract, runtime, kit CLI, plugin and MCP server, canvas, and Netlify preview config. The 0.1.0 packages are on npm as `@cogitato/*`, and the plugin installs from this repo's marketplace. Design workspaces (a folder per prototype, ADR 017) are the first step of Phase 3's hosting work and ship as 0.2.0. Next after that is Phase 4: comments and the team canvas, in the platform.
+Phases 0–2 are built, and Phase 3's local canvas is too. Hosted previews, the rest of Phase 3, are in progress; Phase 4 (comments and the team canvas) follows.
 
 ## Develop
 See [CONTRIBUTING.md](CONTRIBUTING.md).
