@@ -20,11 +20,16 @@ const cut = (s: string, n: number) => s.slice(0, Math.max(0, n)).replace(/-+$/, 
 /**
  * The DNS label of a branch preview: "<branch>--<prototype>--<org>". A label longer than 63
  * characters keeps the prototype and org, and shortens the branch with a hash of the full label.
- * If even that doesn't fit, the whole label is shortened.
+ * If even that doesn't fit, the whole label is shortened. An empty branch or prototype part
+ * becomes "branch" or "prototype"; an empty org is an error. A label never starts with "xn--"
+ * (DNS keeps that for internationalized names): the branch part gets a "b-" prefix instead.
  */
 export function previewHost(parts: { branch: string; prototype: string; org: string }): string {
-  const branch = slugPart(parts.branch);
-  const tail = `--${slugPart(parts.prototype)}--${slugPart(parts.org)}`;
+  const org = slugPart(parts.org);
+  if (!org) throw new Error("previewHost needs an org name");
+  const tail = `--${slugPart(parts.prototype) || "prototype"}--${org}`;
+  let branch = slugPart(parts.branch) || "branch";
+  if (`${branch}${tail}`.startsWith("xn--")) branch = `b-${branch}`;
   const full = `${branch}${tail}`;
   if (full.length <= MAX_LABEL) return full;
   const h = hash(full);

@@ -28,7 +28,9 @@ acme-design/                       # workspace root
 | branch `Feature//New  Flow`, prototype `Check_Out`, org `Acme--Shop` | `feature-new-flow--check-out--acme-shop` |
 | branch `design/` followed by `very-long-branch-name-` five times, prototype `checkout`, org `acme-shop-demo` | `design-very-long-branch-name-v-41cab7--checkout--acme-shop-demo` |
 
-The third is over 63 characters, so the branch part is cut short and given a 6-character hash of the full branch. The result is always the same for the same input, and two long branches with a shared start get different hosts.
+The third is over 63 characters, so the branch part is cut short and given a 6-character hash of the full label. The result is always the same for the same input, and two long branches with a shared start get different hosts.
+
+An empty branch or prototype part (after slugging) becomes `branch` or `prototype`, an empty org is an error, and a label that would start with `xn--` gets `b-` before the branch part (checked before the length), so `xn` becomes `b-xn--checkout--acme`.
 
 ### Affected prototypes
 `affectedPrototypes(changedPaths, allPrototypes)` says which prototypes a change touches (paths relative to the workspace root):

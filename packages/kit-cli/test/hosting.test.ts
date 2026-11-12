@@ -36,6 +36,32 @@ describe("previewHost", () => {
     expect(host).toMatch(/^[a-z0-9-]+-[0-9a-f]{6}$/);
     expect(host).not.toMatch(/^-|-$/);
   });
+
+  it("names an empty branch or prototype part instead of leaving it blank", () => {
+    expect(previewHost({ branch: "///", prototype: "checkout", org: "acme" })).toBe("branch--checkout--acme");
+    expect(previewHost({ branch: "main", prototype: "__", org: "acme" })).toBe("main--prototype--acme");
+  });
+
+  it("needs an org name", () => {
+    expect(() => previewHost({ branch: "main", prototype: "checkout", org: "" })).toThrow("previewHost needs an org name");
+    expect(() => previewHost({ branch: "main", prototype: "checkout", org: "--" })).toThrow("previewHost needs an org name");
+  });
+
+  it("never starts a label with xn--, which DNS keeps for other scripts", () => {
+    const host = previewHost({ branch: "xn", prototype: "checkout", org: "acme" });
+    expect(host).toBe("b-xn--checkout--acme");
+    expect(host.startsWith("b-xn--")).toBe(true);
+  });
+
+  it("keeps a label of exactly 63 characters and shortens one of 64 to 63 with a hash", () => {
+    // "--checkout--acme" is 16 characters.
+    const fits = previewHost({ branch: "a".repeat(47), prototype: "checkout", org: "acme" });
+    expect(fits).toBe(`${"a".repeat(47)}--checkout--acme`);
+    expect(fits).toHaveLength(63);
+    const over = previewHost({ branch: "a".repeat(48), prototype: "checkout", org: "acme" });
+    expect(over).toHaveLength(63);
+    expect(over).toMatch(/^a{40}-[0-9a-f]{6}--checkout--acme$/);
+  });
 });
 
 describe("affectedPrototypes", () => {
