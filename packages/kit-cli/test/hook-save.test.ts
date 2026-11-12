@@ -21,7 +21,7 @@ describe("post-edit hook", () => {
   it("only checks prototype source and the design folder", () => {
     expect(checkedByHook("src/screens/cart/screen.tsx")).toBe(true);
     expect(checkedByHook("src/styles/global.css")).toBe(true);
-    expect(checkedByHook("design/contract/tokens.json")).toBe(true);
+    expect(checkedByHook("design/flows.json")).toBe(true);
     expect(checkedByHook("../../kit/Button.tsx")).toBe(false);
     expect(checkedByHook("README.md")).toBe(false);
     expect(checkedByHook("../elsewhere/screen.tsx")).toBe(false);
@@ -55,11 +55,49 @@ describe("post-edit hook", () => {
   it("stays silent outside a Cogitato prototype", async () => {
     expect(await runHook("post-edit", { cwd: join(root, ".."), tool_input: { file_path: join(root, "..", "x.tsx") } })).toBeUndefined();
   });
+
+  it("checks an edit in the second prototype against that prototype", async () => {
+    const proto = copyTemplate({ second: true });
+    const ws = dirname(dirname(proto));
+    try {
+      const file = join(ws, "prototypes", "onboarding", "src", "screens", "cart", "screen.tsx");
+      writeFileSync(file, readFileSync(file, "utf8").replace('data-kit-id="cart.checkout"', 'data-x="cart.checkout"'));
+      const r = await runHook("post-edit", { cwd: ws, tool_input: { file_path: file } });
+      expect(r?.decision).toBe("block");
+      expect(r?.reason).toMatch(/^Cogitato check of prototypes\/onboarding\/src\/screens\/cart\/screen\.tsx/);
+    } finally {
+      removeTemplate(proto);
+    }
+  });
+
+  it("checks the shared contract when it's edited", async () => {
+    const proto = copyTemplate({ second: true });
+    const ws = dirname(dirname(proto));
+    try {
+      const file = join(ws, "design", "contract", "tokens.json");
+      writeFileSync(file, "{ not json");
+      const r = await runHook("post-edit", { cwd: ws, tool_input: { file_path: file } });
+      expect(r?.decision).toBe("block");
+      expect(r?.reason).toMatch(/design\/contract\/tokens\.json/);
+    } finally {
+      removeTemplate(proto);
+    }
+  });
 });
 
 describe("session-start hook", () => {
+  it("describes every prototype at session start", async () => {
+    const proto = copyTemplate({ second: true });
+    try {
+      const r = await runHook("session-start", { cwd: dirname(dirname(proto)) });
+      expect(r?.hookSpecificOutput?.additionalContext).toMatch(/2 prototypes: checkout \(4 screens, 8 states\), onboarding \(4 screens, 8 states\)/);
+    } finally {
+      removeTemplate(proto);
+    }
+  });
+
   it("gives Claude the prototype's shape and flags setup problems for the designer", async () => {
-    const out = await sessionStartHook(project, { offline: true });
+    const out = await sessionStartHook(project.workspace, { offline: true });
     expect(out.systemMessage).toMatch(/^Cogitato: this prototype isn't ready on this computer yet\. The prototype's parts aren't installed yet/);
     expect(out.hookSpecificOutput?.hookEventName).toBe("SessionStart");
     expect(out.hookSpecificOutput?.additionalContext).toContain("4 screens, 8 states");
