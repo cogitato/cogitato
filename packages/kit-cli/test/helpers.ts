@@ -29,11 +29,11 @@ export interface BadCase {
  */
 export function copyTemplate(opts: { second?: boolean } = {}): string {
   const ws = mkdtempSync(join(tmpdir(), "cogitato-ws-"));
-  for (const part of ["design", "kit", "package.json", ".env.example"]) {
+  for (const part of ["design", "kit", "package.json"]) {
     cpSync(join(workspaceDir, part), join(ws, part), { recursive: true });
   }
   const proto = join(ws, "prototypes", "checkout");
-  for (const part of ["src", "design", "package.json"]) {
+  for (const part of ["src", "design", "package.json", ".env.example"]) {
     cpSync(join(templateDir, part), join(proto, part), { recursive: true });
   }
   if (opts.second) cpSync(proto, join(ws, "prototypes", "onboarding"), { recursive: true });

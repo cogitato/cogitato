@@ -23,7 +23,7 @@ Work in the workspace root: the folder that contains `design/contract` and `prot
    - Check it with `pnpm --version`.
    - If it's missing, run `corepack enable pnpm`. If corepack isn't available, use `npm install -g pnpm`.
 3. **The workspace's parts.** Run `pnpm install` in the workspace root.
-4. **Settings.** If `.env.example` exists and `.env` doesn't, copy it to `.env`. If a value is blank and a prototype needs it, tell the designer to ask a developer for it. Never invent secrets.
+4. **Settings.** Each prototype keeps its own settings. In every `prototypes/<name>/` folder that has a `.env.example` but no `.env`, copy `.env.example` to `.env` in that same folder. If a value is blank and a prototype needs it, tell the designer to ask a developer for it. Never invent secrets.
 5. **Saving versions.** If `git config user.name` or `git config user.email` is empty, ask the designer which name and email to put on their work, and set both.
 6. **Check.** Run `pnpm kit doctor`. Fix anything marked PROBLEM by going back to the step it relates to.
 7. **Start it.**

@@ -1,8 +1,8 @@
-import { cpSync, existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { afterEach, expect, it, vi } from "vitest";
 import { main } from "../src/cli.js";
-import { createPrototype, findWorkspace, listPrototypes, validateWorkspace } from "../src/index.js";
+import { createPrototype, findWorkspace, listPrototypes, projectIn, prototypeChecks, validateWorkspace } from "../src/index.js";
 import { applyOps, copyTemplate } from "./helpers.js";
 
 let proto: string | undefined;
@@ -74,6 +74,7 @@ it("creates a new prototype that validates", () => {
   expect(pkg.dependencies["@cogitato/runtime"]).toBe(JSON.parse(readFileSync(ws.abs("prototypes/checkout/package.json"), "utf8")).dependencies["@cogitato/runtime"]);
   expect(existsSync(ws.abs("prototypes/onboarding/src/screens/home/screen.tsx"))).toBe(true);
   expect(r.files).toContain("prototypes/onboarding/src/flows.ts");
+  expect(r.files).toContain("prototypes/onboarding/.env.example");
   expect(validateWorkspace(ws).issues.filter((i) => i.file.startsWith("prototypes/onboarding"))).toEqual([]);
 });
 
@@ -84,6 +85,16 @@ it("refuses bad or taken names in plain words", () => {
   expect(() => createPrototype(ws, "My Flow")).toThrow(/lowercase words with dashes/);
   mkdirSync(ws.abs("prototypes/drafts"));
   expect(() => createPrototype(ws, "drafts")).toThrow(/already a prototype called "drafts"/);
+});
+
+it("checks each prototype's own .env settings", () => {
+  proto = copyTemplate({ second: true });
+  const ws = findWorkspace(proto)!;
+  writeFileSync(ws.abs("prototypes/onboarding/.env.example"), "PAYMENTS_KEY=\n");
+  const env = (name: string) => prototypeChecks(projectIn(ws, name)).find((c) => c.id === "env")!;
+  expect(env("checkout").status).toBe("ok");
+  expect(env("onboarding")).toMatchObject({ status: "problem" });
+  expect(env("onboarding").message).toContain("PAYMENTS_KEY");
 });
 
 it("lists only prototype folders with a valid name", () => {
