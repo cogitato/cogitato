@@ -104,7 +104,7 @@ describe("plugin launchers", () => {
   });
 
   it("offers setup when the prototype's parts aren't installed, and stays quiet elsewhere", () => {
-    expect(hook("session-start", bare)?.systemMessage).toContain("Cogitato's tools aren't installed in this prototype yet");
+    expect(hook("session-start", bare)?.systemMessage).toContain("Cogitato's tools aren't installed in this design workspace yet");
     expect(hook("post-edit", bare, { tool_input: { file_path: join(bare, "prototypes/checkout/src/flows.ts") } })).toBeUndefined();
     expect(hook("session-start", other)).toBeUndefined();
   });
@@ -124,7 +124,7 @@ describe("plugin launchers", () => {
   }, 20_000);
 
   it("answers with no tools, and says why, when there's no server to start", async () => {
-    for (const [dir, why] of [[bare, "aren't installed in this prototype yet"], [other, "isn't a Cogitato prototype"]] as const) {
+    for (const [dir, why] of [[bare, "aren't installed in this design workspace yet"], [other, "isn't a Cogitato design workspace"]] as const) {
       const client = await connect(dir);
       expect((await client.listTools()).tools).toEqual([]);
       expect(client.getInstructions()).toContain(why);

@@ -1,6 +1,6 @@
 ---
 name: add-state
-description: Add a state to an existing screen of a Cogitato prototype (an error, empty, loading or other variation), connect it in the flow, check it and link it. Use when the designer asks for a variation of a screen.
+description: Add a state to an existing screen of a prototype in a Cogitato design workspace (an error, empty, loading or other variation), connect it in the flow, check it and link it. Use when the designer asks for a variation of a screen.
 when_to_use: 'For example "show what happens when the card is expired", "add an empty state to the cart", "what does payment look like while it is processing".'
 argument-hint: "[screen and what the state shows]"
 allowed-tools: mcp__plugin_cogitato_kit__list_components mcp__plugin_cogitato_kit__get_component mcp__plugin_cogitato_kit__get_tokens mcp__plugin_cogitato_kit__add_state mcp__plugin_cogitato_kit__log_gap mcp__plugin_cogitato_kit__validate mcp__plugin_cogitato_kit__canvas_link
@@ -16,7 +16,7 @@ Request: $ARGUMENTS
    - Find the screen they mean. Each screen registers itself in its `screen.tsx` with `defineScreen`.
    - Choose a state name of lowercase words joined by dashes (`card-expired`) and a short title ("Card expired").
    - Decide which existing state leads to it, and by what action. For example, `checkout.payment.processing` leads to it, labelled "Card expired".
-   - Ask only if the screen is genuinely unclear.
+   - Ask only if the screen is genuinely unclear. If the workspace has more than one prototype (`list_prototypes`) and it isn't clear which, ask, then pass `prototype` to the tools.
 2. **Add it** with `add_state` (`screen`, `state`, `title`, `from`, `label`).
 3. **Make the screen show it:**
    - Fill in the new state's `data` in the screen's `fixtures`.

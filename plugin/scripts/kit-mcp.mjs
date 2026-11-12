@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-// MCP server launcher. In a prototype with @cogitato/kit-mcp installed, it runs that server
-// (the version the prototype pins). Otherwise it answers as a tiny MCP server with no tools, so
+// MCP server launcher. In a workspace with @cogitato/kit-mcp installed, it runs that server
+// (the version the workspace pins). Otherwise it answers as a tiny MCP server with no tools, so
 // Claude Code doesn't show a failed server, and its instructions say why there are no tools.
 import { createInterface } from "node:readline";
 import { pathToFileURL } from "node:url";
-import { NOT_INSTALLED, findPrototype, installed, startDir } from "./lib.mjs";
+import { NOT_INSTALLED, findWorkspace, installed, startDir } from "./lib.mjs";
 
-const root = findPrototype(startDir());
+const root = findWorkspace(startDir());
 const server = root ? installed(root, "kit-mcp", "bin/kit-mcp.js") : undefined;
 
 if (server) {
@@ -15,7 +15,7 @@ if (server) {
 } else {
   const instructions = root
     ? NOT_INSTALLED
-    : "This folder isn't a Cogitato prototype, so Cogitato's tools aren't available here.";
+    : "This folder isn't a Cogitato design workspace, so Cogitato's tools aren't available here.";
   const send = (msg) => process.stdout.write(JSON.stringify({ jsonrpc: "2.0", ...msg }) + "\n");
   for await (const line of createInterface({ input: process.stdin })) {
     let msg;
