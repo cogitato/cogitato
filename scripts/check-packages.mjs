@@ -9,9 +9,10 @@ const expect = {
   "packages/contract": ["dist/index.js", "dist/browser.js", "schema/flows.schema.json", "schema/snapshots.schema.json"],
   "packages/runtime": ["dist/index.js", "dist/vite.js", "client.d.ts"],
   "packages/canvas": ["dist/index.js"],
-  "packages/kit-cli": ["bin/kit.js", "dist/cli.js", "dist/index.js"],
+  "packages/kit-cli": ["bin/kit.js", "dist/cli.js", "dist/index.js", "dist/hosting.js", "dist/hosting.d.ts"],
   "packages/kit-mcp": ["bin/kit-mcp.js", "dist/index.js"],
-  "packages/create-cogitato": ["bin/create-cogitato.js", "dist/create.js", "template/package.json", "template/_gitignore", "template/pnpm-workspace.yaml", "template/design/contract/tokens.json"],
+  "packages/create-cogitato": ["bin/create-cogitato.js", "dist/create.js", "template/package.json", "template/_gitignore", "template/_pnpm-workspace.yaml", "template/design/contract/tokens.json",
+    "template/kit/Button.tsx", "template/prototypes/checkout/package.json", "template/prototypes/checkout/design/flows.json"],
 };
 const forbidden = [/^src\//, /^test\//, /^fixtures\//, /\.test\./, /^template\/node_modules\//, /^template\/dist\//, /^tsconfig/];
 
