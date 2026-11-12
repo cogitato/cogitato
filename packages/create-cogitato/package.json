@@ -1,6 +1,6 @@
 {
   "name": "create-cogitato",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Start a Cogitato design workspace: npm create cogitato@latest my-design",
   "license": "Apache-2.0",
   "repository": {
