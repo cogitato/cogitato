@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, rmSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
 import { dirname } from "node:path";
 import { afterEach, expect, it, vi } from "vitest";
 import { main } from "../src/cli.js";
@@ -82,4 +82,13 @@ it("refuses bad or taken names in plain words", () => {
   const ws = findWorkspace(proto)!;
   expect(() => createPrototype(ws, "checkout")).toThrow(/already a prototype called "checkout"/);
   expect(() => createPrototype(ws, "My Flow")).toThrow(/lowercase words with dashes/);
+  mkdirSync(ws.abs("prototypes/drafts"));
+  expect(() => createPrototype(ws, "drafts")).toThrow(/already a prototype called "drafts"/);
+});
+
+it("lists only prototype folders with a valid name", () => {
+  proto = copyTemplate();
+  const ws = findWorkspace(proto)!;
+  cpSync(proto, ws.abs("prototypes/Old Copy"), { recursive: true });
+  expect(listPrototypes(ws)).toEqual(["checkout"]);
 });

@@ -1,12 +1,14 @@
 import { dirname, isAbsolute } from "node:path";
-import { doctor, type DoctorOptions } from "./doctor.js";
+import { machineChecks, prototypeChecks, type DoctorOptions } from "./doctor.js";
 import { exportFlows } from "./export-flows.js";
 import { formatResult } from "./format.js";
 import {
   LAYOUT,
+  OLD_LAYOUT_MESSAGE,
   WORKSPACE_LAYOUT,
   findProject,
   findWorkspace,
+  isOldLayout,
   isScreenFile,
   listPrototypes,
   projectIn,
@@ -91,8 +93,22 @@ function contractEditHook(ws: Workspace, rel: string): HookOutput | undefined {
 
 /** At session start: tell the designer (one line) and Claude (details) if the machine isn't ready. */
 export async function sessionStartHook(ws: Workspace, opts: DoctorOptions = {}): Promise<HookOutput> {
+  if (isOldLayout(ws)) {
+    return {
+      systemMessage: `Cogitato: ${OLD_LAYOUT_MESSAGE}`,
+      hookSpecificOutput: {
+        hookEventName: "SessionStart",
+        additionalContext: [
+          OLD_LAYOUT_MESSAGE,
+          "Explain this to the person in plain words (they are usually a designer): the Cogitato tools won't work in this folder until a developer moves it to the new layout.",
+          "Don't create a prototypes/ folder or move files yourself to work around it.",
+        ].join("\n"),
+      },
+    };
+  }
   const names = listPrototypes(ws);
-  const checks = (await Promise.all(names.map((n) => doctor(projectIn(ws, n), opts)))).flat();
+  // Machine-wide checks run once; the rest once per prototype.
+  const checks = [...(await machineChecks(opts)), ...names.flatMap((n) => prototypeChecks(projectIn(ws, n)))];
   const unique = (status: string) => {
     const seen = new Set<string>();
     return checks.filter((c) => c.status === status && !seen.has(c.message) && seen.add(c.message));
@@ -107,7 +123,9 @@ export async function sessionStartHook(ws: Workspace, opts: DoctorOptions = {}):
     return `${name} (${reg.screens.length} screen${reg.screens.length === 1 ? "" : "s"}, ${states} state${states === 1 ? "" : "s"})`;
   });
   const first =
-    `This is a Cogitato design workspace with ${parts.length} prototype${parts.length === 1 ? "" : "s"}: ${parts.join(", ")}. ` +
+    (parts.length
+      ? `This is a Cogitato design workspace with ${parts.length} prototype${parts.length === 1 ? "" : "s"}: ${parts.join(", ")}. `
+      : "This is a Cogitato design workspace with no prototypes yet. ") +
     "The design kit (design/contract and kit/) is shared by all of them; each prototype is a folder in prototypes/. " +
     "When the person doesn't say which prototype they mean and there's more than one, ask.";
 
@@ -124,7 +142,7 @@ export async function sessionStartHook(ws: Workspace, opts: DoctorOptions = {}):
 
   return {
     ...(problems.length
-      ? { systemMessage: `Cogitato: this prototype isn't ready on this computer yet. ${problems[0]!.message} Ask Claude to set it up.` }
+      ? { systemMessage: `Cogitato: this design workspace isn't ready on this computer yet. ${problems[0]!.message} Ask Claude to set it up.` }
       : {}),
     hookSpecificOutput: { hookEventName: "SessionStart", additionalContext: context },
   };

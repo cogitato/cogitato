@@ -5,7 +5,17 @@ import { KitError } from "./errors.js";
 import { exportFlows } from "./export-flows.js";
 import { createScreen } from "./scaffold.js";
 import { parseSource, type Issue } from "./issue.js";
-import { LAYOUT, WORKSPACE_LAYOUT, listPrototypes, projectIn, readContract, type Workspace } from "./project.js";
+import {
+  LAYOUT,
+  OLD_LAYOUT_MESSAGE,
+  PROTOTYPE_NAME,
+  WORKSPACE_LAYOUT,
+  isOldLayout,
+  listPrototypes,
+  projectIn,
+  readContract,
+  type Workspace,
+} from "./project.js";
 import { checkCssFile } from "./rules/css.js";
 import { checkTsxFile, duplicateKitIds, type KitIdUse } from "./rules/tsx.js";
 import { sortIssues, validate } from "./validate.js";
@@ -49,6 +59,7 @@ export function validateKit(ws: Workspace): Issue[] {
 
 /** Checks the shared contract and kit once, then every prototype. Issue files are workspace-relative. */
 export function validateWorkspace(ws: Workspace, opts: { contractOnly?: boolean } = {}): ValidationResult {
+  if (isOldLayout(ws)) throw new KitError(OLD_LAYOUT_MESSAGE);
   const issues: Issue[] = [];
   const contract = validateProject(ws.abs(LAYOUT.design), ws.abs(WORKSPACE_LAYOUT.contract));
   issues.push(
@@ -66,8 +77,16 @@ export function validateWorkspace(ws: Workspace, opts: { contractOnly?: boolean 
   return { ok: !issues.some((i) => i.severity === "error"), issues: sortIssues(issues) };
 }
 
+/** What to tell a designer when validateWorkspace found nothing, so an empty workspace doesn't read as checked prototypes. */
+export function workspaceSuccess(ws: Workspace, opts: { contractOnly?: boolean } = {}): string {
+  if (opts.contractOnly) return "All good: the design contract is fine.";
+  const count = listPrototypes(ws).length;
+  if (!count) return "The design contract and kit are fine. There are no prototypes yet.";
+  return count === 1 ? "All good: the prototype follows the design contract." : "All good: the prototypes follow the design contract.";
+}
+
 // Files a new prototype copies from an existing one, so it gets the same pinned versions and setup.
-const SKELETON = ["package.json", "index.html", "vite.config.ts", "tsconfig.json", "netlify.toml", "src/main.tsx", "src/styles/global.css"];
+const SKELETON = ["package.json", "index.html", "vite.config.ts", "tsconfig.json", "netlify.toml", ".env.example", "src/main.tsx", "src/styles/global.css"];
 
 const EMPTY_FLOWS = `import { defineFlows } from "@cogitato/runtime";
 
@@ -78,11 +97,11 @@ export default defineFlows([]);
 
 /** Starts prototypes/<name>/ from an existing prototype's setup, with one empty Home screen. */
 export function createPrototype(ws: Workspace, name: string): { name: string; files: string[] } {
-  if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(name)) {
+  if (!PROTOTYPE_NAME.test(name)) {
     throw new KitError(`"${name}" can't be a prototype name. Use lowercase words with dashes, like "onboarding" or "account-settings".`);
   }
   const existing = listPrototypes(ws);
-  if (existing.includes(name)) throw new KitError(`There's already a prototype called "${name}". Pick another name.`);
+  if (existing.includes(name) || existsSync(ws.abs(`${WORKSPACE_LAYOUT.prototypes}/${name}`))) throw new KitError(`There's already a prototype called "${name}". Pick another name.`);
   if (!existing.length) throw new KitError("There's no prototype here to copy the setup from. Ask a developer to check the workspace.");
   const from = ws.abs(`${WORKSPACE_LAYOUT.prototypes}/${existing[0]}`);
   const to = ws.abs(`${WORKSPACE_LAYOUT.prototypes}/${name}`);

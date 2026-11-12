@@ -1,12 +1,15 @@
 // Library entry. Hooks, skills and the kit MCP server call these; they don't reimplement them.
-export { DEFAULT_PORT, doctor, formatDoctor, isServerUp, type CheckStatus, type DoctorCheck, type DoctorOptions } from "./doctor.js";
+export { DEFAULT_PORT, doctor, formatDoctor, machineChecks, prototypeChecks, isServerUp, type CheckStatus, type DoctorCheck, type DoctorOptions } from "./doctor.js";
 export { exportFlows, type ExportOptions } from "./export-flows.js";
 export { buildManifest, keptStatus, sameManifest, serializeManifest, type ExportResult } from "./flows.js";
 export { formatResult } from "./format.js";
 export { KIT_PATH, preview, type PreviewOptions, type PreviewResult } from "./preview.js";
 export {
   LAYOUT,
+  OLD_LAYOUT_MESSAGE,
+  PROTOTYPE_NAME,
   WORKSPACE_LAYOUT,
+  isOldLayout,
   findProject,
   findWorkspace,
   listPrototypes,
@@ -20,7 +23,7 @@ export {
   type Project,
   type Workspace,
 } from "./project.js";
-export { createPrototype, validateKit, validateWorkspace } from "./workspace.js";
+export { createPrototype, validateKit, validateWorkspace, workspaceSuccess } from "./workspace.js";
 export { ID_PATTERNS, humanize, readFlows, readRegistry, readScreen, type Registry, type ScreenEntry } from "./registry.js";
 export { checkCssValue } from "./rules/css-values.js";
 export { validate, type ValidateOptions } from "./validate.js";

@@ -98,7 +98,7 @@ describe("session-start hook", () => {
 
   it("gives Claude the prototype's shape and flags setup problems for the designer", async () => {
     const out = await sessionStartHook(project.workspace, { offline: true });
-    expect(out.systemMessage).toMatch(/^Cogitato: this prototype isn't ready on this computer yet\. The prototype's parts aren't installed yet/);
+    expect(out.systemMessage).toMatch(/^Cogitato: this design workspace isn't ready on this computer yet\. The prototype's parts aren't installed yet/);
     expect(out.hookSpecificOutput?.hookEventName).toBe("SessionStart");
     expect(out.hookSpecificOutput?.additionalContext).toContain("4 screens, 8 states");
     expect(out.hookSpecificOutput?.additionalContext).toContain("setup-machine");

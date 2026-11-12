@@ -60,3 +60,24 @@ export function applyOps(root: string, ops: BadCase["ops"]): void {
 export function removeTemplate(proto: string): void {
   rmSync(dirname(dirname(proto)), { recursive: true, force: true });
 }
+
+/**
+ * A 0.1.0-layout repo: the template's shared design/ and kit/ at a temp folder's root, with the
+ * checkout prototype's own files (src/, design/flows.json, vite.config.ts...) next to them.
+ * Returns the folder.
+ */
+export function copyOldLayout(): string {
+  const root = mkdtempSync(join(tmpdir(), "cogitato-old-"));
+  for (const part of ["design", "kit"]) cpSync(join(workspaceDir, part), join(root, part), { recursive: true });
+  for (const part of ["src", "design", "package.json", "vite.config.ts", "index.html", "tsconfig.json"]) {
+    cpSync(join(templateDir, part), join(root, part), { recursive: true });
+  }
+  return root;
+}
+
+/** A workspace with the shared contract and kit, and an empty prototypes/ folder. Returns its root. */
+export function copyEmptyWorkspace(): string {
+  const proto = copyTemplate();
+  rmSync(proto, { recursive: true, force: true });
+  return dirname(dirname(proto));
+}
