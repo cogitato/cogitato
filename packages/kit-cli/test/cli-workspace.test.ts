@@ -44,6 +44,18 @@ it("validates every prototype from the root", async () => {
   expect(r.code).toBe(0);
 });
 
+it("checks only the shared contract at the root with --contract", async () => {
+  proto = copyTemplate({ second: true });
+  applyOps(proto, [{ op: "replace", file: "src/screens/cart/screen.tsx", find: 'id: "cart"', with: 'id: "Cart!"' }]);
+  const root = dirname(dirname(proto));
+  const all = await run(root, "validate", "--json");
+  expect(all.code).toBe(1);
+  const r = await run(root, "validate", "--contract", "--json");
+  expect(r.code).toBe(0);
+  const report = JSON.parse(r.out);
+  expect(report.issues.filter((i: { file: string }) => i.file.startsWith("prototypes/"))).toEqual([]);
+});
+
 it("still checks the shared kit when validating from inside a prototype", async () => {
   proto = copyTemplate();
   applyOps(proto, [{ op: "write", file: "../../kit/Button.module.css", text: ".x { color: #ff0000; }\n" }]);

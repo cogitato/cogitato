@@ -109,7 +109,10 @@ ${HELP}`);
         const files = args.files === undefined ? undefined : [args.files, ...rest].flat().map(String).filter(Boolean);
         const ws = workspace();
         const single = opt("prototype") || files || listPrototypes(ws).length === 1 || findProjectHere(ws);
-        let r = single ? validate(proto(), { contractOnly: args.contract, ...(files ? { files } : {}) }) : validateWorkspace(ws);
+        // At the root with several prototypes, --contract checks only the shared contract.
+        let r = single
+          ? validate(proto(), { contractOnly: args.contract, ...(files ? { files } : {}) })
+          : validateWorkspace(ws, { contractOnly: Boolean(args.contract) });
         if (single && !files && !args.contract) {
           // A prototype's build runs this from inside it: keep the shared kit checked too.
           const issues = sortIssues([...r.issues, ...validateKit(ws)]);

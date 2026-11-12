@@ -48,7 +48,7 @@ export function validateKit(ws: Workspace): Issue[] {
 }
 
 /** Checks the shared contract and kit once, then every prototype. Issue files are workspace-relative. */
-export function validateWorkspace(ws: Workspace): ValidationResult {
+export function validateWorkspace(ws: Workspace, opts: { contractOnly?: boolean } = {}): ValidationResult {
   const issues: Issue[] = [];
   const contract = validateProject(ws.abs(LAYOUT.design), ws.abs(WORKSPACE_LAYOUT.contract));
   issues.push(
@@ -56,6 +56,7 @@ export function validateWorkspace(ws: Workspace): ValidationResult {
       .filter((i) => i.file.startsWith("contract/"))
       .map((i) => ({ ...i, file: `${WORKSPACE_LAYOUT.contract}/${i.file.slice("contract/".length)}` })),
   );
+  if (opts.contractOnly) return { ok: !issues.some((i) => i.severity === "error"), issues: sortIssues(issues) };
   issues.push(...validateKit(ws));
 
   for (const name of listPrototypes(ws)) {

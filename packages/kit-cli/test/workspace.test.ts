@@ -85,10 +85,11 @@ describe("validateWorkspace", () => {
 
 describe("projectAt", () => {
   it("accepts a prototype folder and rejects anything else", () => {
-    proto = copyTemplate();
-    expect(projectAt(proto).name).toBe("checkout");
-    const ws = findWorkspace(proto)!;
+    const dir = copyTemplate();
+    proto = dir;
+    expect(projectAt(dir).name).toBe("checkout");
+    const ws = findWorkspace(dir)!;
     expect(() => projectAt(join(ws.root, "design", "checkout"))).toThrow(KitError);
-    expect(() => projectAt(join(proto, "src"))).toThrow(KitError);
+    expect(() => projectAt(join(dir, "src"))).toThrow(KitError);
   });
 });
