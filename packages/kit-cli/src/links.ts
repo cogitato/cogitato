@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { DEFAULT_PORT } from "./doctor.js";
 import { KitError } from "./errors.js";
-import { previewHost } from "./hosting.js";
+import { previewHost, slugPart } from "./hosting.js";
 import { sourceFiles, type Project } from "./project.js";
 import { readRegistry, type ScreenEntry } from "./registry.js";
 
@@ -53,7 +53,7 @@ export function previewLink(project: Project, branch: string, node?: string): st
   } catch {
     return undefined;
   }
-  if (typeof kit?.previewUrl !== "string" || !kit.previewUrl.includes("{host}") || typeof kit.org !== "string") return undefined;
+  if (typeof kit?.previewUrl !== "string" || !kit.previewUrl.includes("{host}") || typeof kit.org !== "string" || !slugPart(kit.org)) return undefined;
   const host = previewHost({ branch, prototype: project.name, org: kit.org });
   const base = kit.previewUrl.replace("{host}", host).replace(/\/+$/, "");
   return `${base}${CANVAS_PATH}${node ? `?focus=${encodeURIComponent(node)}` : ""}`;

@@ -27,3 +27,9 @@ it("has no link without hosting set up", () => {
   setKit(dirname(dirname(proto)), { previewUrl: "https://{branch}--x.netlify.app" });
   expect(previewLink(projectAt(proto), "main")).toBeUndefined();
 });
+
+it("has no link when the org name is empty", () => {
+  proto = copyTemplate();
+  setKit(dirname(dirname(proto)), { previewUrl: "https://{host}.cogitato-preview.app", org: "--" });
+  expect(previewLink(projectAt(proto), "main")).toBeUndefined();
+});
