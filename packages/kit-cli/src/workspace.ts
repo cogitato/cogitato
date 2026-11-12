@@ -7,10 +7,8 @@ import { createScreen } from "./scaffold.js";
 import { parseSource, type Issue } from "./issue.js";
 import {
   LAYOUT,
-  OLD_LAYOUT_MESSAGE,
   PROTOTYPE_NAME,
   WORKSPACE_LAYOUT,
-  isOldLayout,
   listPrototypes,
   projectIn,
   readContract,
@@ -59,7 +57,6 @@ export function validateKit(ws: Workspace): Issue[] {
 
 /** Checks the shared contract and kit once, then every prototype. Issue files are workspace-relative. */
 export function validateWorkspace(ws: Workspace, opts: { contractOnly?: boolean } = {}): ValidationResult {
-  if (isOldLayout(ws)) throw new KitError(OLD_LAYOUT_MESSAGE);
   const issues: Issue[] = [];
   const contract = validateProject(ws.abs(LAYOUT.design), ws.abs(WORKSPACE_LAYOUT.contract));
   issues.push(

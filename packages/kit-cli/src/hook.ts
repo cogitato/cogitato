@@ -4,11 +4,9 @@ import { exportFlows } from "./export-flows.js";
 import { formatResult } from "./format.js";
 import {
   LAYOUT,
-  OLD_LAYOUT_MESSAGE,
   WORKSPACE_LAYOUT,
   findProject,
   findWorkspace,
-  isOldLayout,
   isScreenFile,
   listPrototypes,
   projectIn,
@@ -93,19 +91,6 @@ function contractEditHook(ws: Workspace, rel: string): HookOutput | undefined {
 
 /** At session start: tell the designer (one line) and Claude (details) if the machine isn't ready. */
 export async function sessionStartHook(ws: Workspace, opts: DoctorOptions = {}): Promise<HookOutput> {
-  if (isOldLayout(ws)) {
-    return {
-      systemMessage: `Cogitato: ${OLD_LAYOUT_MESSAGE}`,
-      hookSpecificOutput: {
-        hookEventName: "SessionStart",
-        additionalContext: [
-          OLD_LAYOUT_MESSAGE,
-          "Explain this to the person in plain words (they are usually a designer): the Cogitato tools won't work in this folder until a developer moves it to the new layout.",
-          "Don't create a prototypes/ folder or move files yourself to work around it.",
-        ].join("\n"),
-      },
-    };
-  }
   const names = listPrototypes(ws);
   // Machine-wide checks run once; the rest once per prototype.
   const checks = [...(await machineChecks(opts)), ...names.flatMap((n) => prototypeChecks(projectIn(ws, n)))];

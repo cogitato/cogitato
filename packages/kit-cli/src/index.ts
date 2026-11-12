@@ -6,10 +6,8 @@ export { formatResult } from "./format.js";
 export { KIT_PATH, preview, type PreviewOptions, type PreviewResult } from "./preview.js";
 export {
   LAYOUT,
-  OLD_LAYOUT_MESSAGE,
   PROTOTYPE_NAME,
   WORKSPACE_LAYOUT,
-  isOldLayout,
   findProject,
   findWorkspace,
   listPrototypes,

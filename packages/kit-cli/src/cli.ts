@@ -1,7 +1,7 @@
 import { spawnSync } from "node:child_process";
 import mri from "mri";
 import { toReport } from "@cogitato/contract";
-import { doctor, formatDoctor, machineChecks } from "./doctor.js";
+import { doctor, formatDoctor } from "./doctor.js";
 import { exportFlows } from "./export-flows.js";
 import { KitError } from "./errors.js";
 import { formatResult } from "./format.js";
@@ -9,7 +9,7 @@ import { addGap } from "./gaps.js";
 import { runHook, type HookEvent } from "./hook.js";
 import { canvasLink, stateLink } from "./links.js";
 import { preview } from "./preview.js";
-import { OLD_LAYOUT_MESSAGE, findWorkspace, isOldLayout, listPrototypes, resolvePrototype, type Project, type Workspace } from "./project.js";
+import { findWorkspace, listPrototypes, resolvePrototype, type Project, type Workspace } from "./project.js";
 import { saveVersion } from "./save.js";
 import { addEdge, addState, createScreen, type ScaffoldResult } from "./scaffold.js";
 import { takeSnapshots } from "./snapshots.js";
@@ -109,7 +109,6 @@ ${HELP}`);
         // --files takes the following arguments too: `kit validate --files a.tsx b.css`.
         const files = args.files === undefined ? undefined : [args.files, ...rest].flat().map(String).filter(Boolean);
         const ws = workspace();
-        if (isOldLayout(ws)) throw new KitError(OLD_LAYOUT_MESSAGE);
         const single = opt("prototype") || files || listPrototypes(ws).length === 1 || findProjectHere(ws);
         // At the root with several prototypes, --contract checks only the shared contract.
         let r = single
@@ -153,10 +152,7 @@ ${HELP}`);
         return 0;
       }
       case "doctor": {
-        const ws = workspace();
-        const checks = isOldLayout(ws)
-          ? [...(await machineChecks(port ? { port } : {})), { id: "layout", status: "problem" as const, message: OLD_LAYOUT_MESSAGE }]
-          : await doctor(proto(), port ? { port } : {});
+        const checks = await doctor(proto(), port ? { port } : {});
         out(args.json ? JSON.stringify(checks, null, 2) : formatDoctor(checks, args.quiet));
         return checks.some((c) => c.status === "problem") ? 1 : 0;
       }

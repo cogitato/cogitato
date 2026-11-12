@@ -64,17 +64,6 @@ export function findWorkspace(from: string = process.cwd()): Workspace | undefin
 /** What a prototype's folder name may be: lowercase words with single dashes. */
 export const PROTOTYPE_NAME = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
-/** Told to designers whose repo still has the 0.1.0 single-prototype layout (ADR 017). */
-export const OLD_LAYOUT_MESSAGE =
-  "This folder uses Cogitato's older one-prototype layout. Cogitato 0.2.0 works with design workspaces: " +
-  "ask a developer to move it to the new layout (see ADR 017 in the Cogitato repo).";
-
-/** True for a 0.1.0 repo: no prototypes/ folder, but the old single prototype's files at the root. */
-export function isOldLayout(ws: Workspace): boolean {
-  if (existsSync(ws.abs(WORKSPACE_LAYOUT.prototypes))) return false;
-  return ["src/screens", "src/kit", "vite.config.ts"].some((p) => existsSync(ws.abs(p)));
-}
-
 /** Names of the prototypes in a workspace: folders in prototypes/ with a valid name and a package.json. Sorted. */
 export function listPrototypes(ws: Workspace): string[] {
   const dir = ws.abs(WORKSPACE_LAYOUT.prototypes);
@@ -115,7 +104,6 @@ export function findProject(from: string = process.cwd()): Project | undefined {
 
 /** The named prototype, else the one `from` is in, else the only one. Throws a designer-readable error otherwise. */
 export function resolvePrototype(ws: Workspace, name?: string, from?: string): Project {
-  if (isOldLayout(ws)) throw new KitError(OLD_LAYOUT_MESSAGE);
   if (name) return projectIn(ws, name);
   const found = findProject(from ?? ws.root);
   if (found && found.workspace.root === ws.root) return found;

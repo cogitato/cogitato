@@ -22,14 +22,11 @@ ADR 001) build from an org's repo, so the layout is also what the platform reads
   `package.json`, `pnpm-lock.yaml` or `pnpm-workspace.yaml` affect every prototype).
 - Preview links come from `"kit": { "previewUrl": "https://{host}.<domain>", "org": "<org>" }` in the
   workspace's `package.json`.
-- One layout only: the 0.1.0 single-prototype layout isn't supported. No file format changes, so no
+- One layout only. The 0.1.0 single-prototype layout is dropped without a migration path or
+  detection: nobody used it outside our own test repos. No file format changes, so no
   `schemaVersion` bump.
 
 ## Consequences
-- 0.2.0 is a breaking change for 0.1.0 repos (only our own test repos). Moving one: put the
-  prototype's `src/`, `design/flows.json`, `index.html`, configs and `package.json` under
-  `prototypes/<name>/`, move `src/kit/` to `kit/`, and add the root `package.json` and
-  `pnpm-workspace.yaml` from the template.
 - Netlify is dropped (ADR 013 is superseded): the root `netlify.toml` (the Acme demo) and the
   template's `netlify.toml` are removed. The demo becomes a customer-style repo in its own GitHub
   org, with previews from the platform.
