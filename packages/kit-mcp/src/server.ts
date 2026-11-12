@@ -4,7 +4,7 @@ import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { tokenCssVar } from "@cogitato/contract";
 import {
   KitError,
-  LAYOUT,
+  WORKSPACE_LAYOUT,
   addGap,
   addState,
   createScreen,
@@ -15,8 +15,11 @@ import {
   setStatus,
   stateLink,
   statusLabel,
+  listPrototypes,
+  resolvePrototype,
   validate,
-  type Project,
+  validateWorkspace,
+  type Workspace,
   type ScaffoldResult,
 } from "@cogitato/kit-cli";
 import { z } from "zod";
@@ -26,11 +29,12 @@ import { z } from "zod";
 
 export const SERVER_NAME = "cogitato-kit";
 
-const INSTRUCTIONS = `Tools for this Cogitato prototype's design contract (its design system) and its screens.
+const INSTRUCTIONS = `Tools for this Cogitato workspace's design contract (its design system) and its prototypes' screens.
 Use them instead of reading files in design/contract: list_components and get_component before using a kit component,
 get_tokens before choosing a color, size, space, radius or shadow. Create screens and states with create_screen and add_state,
 then fill in the UI. If the design needs something the kit doesn't have, use log_gap rather than improvising.
-Finish building work with validate and give the person the canvas_link (the canvas shows the new state among the rest of the flow). The person is usually a designer: plain language.`;
+Finish building work with validate and give the person the canvas_link (the canvas shows the new state among the rest of the flow). This is a design workspace: several prototypes share one design kit. Pass \`prototype\` when there's more than one; list_prototypes names them.
+The person is usually a designer: plain language.`;
 
 const text = (t: string, isError = false): CallToolResult => ({ content: [{ type: "text", text: t }], ...(isError ? { isError } : {}) });
 const json = (label: string, data: unknown): CallToolResult => text(`${label}\n\n${JSON.stringify(data, null, 2)}`);
@@ -76,7 +80,10 @@ export function rulesMentioning(markdown: string, name: string): string[] {
 
 const step = z.string().describe('A screen state, written "{screen id}.{state}", like "checkout.payment.default".');
 
-export function createServer(project: Project): McpServer {
+const prototypeArg = z.string().optional().describe("Which prototype (a folder in prototypes/). Leave out when there's only one.");
+
+export function createServer(ws: Workspace): McpServer {
+  const at = (name?: string) => resolvePrototype(ws, name, process.env.KIT_PROJECT);
   const server = new McpServer({ name: SERVER_NAME, version: "0.1.0" }, { instructions: INSTRUCTIONS });
 
   server.registerTool(
@@ -88,7 +95,7 @@ export function createServer(project: Project): McpServer {
     },
     () =>
       run(() => {
-        const { manifests } = readContract(project);
+        const { manifests } = readContract(ws);
         const lines = [...manifests.values()]
           .sort((a, b) => a.name.localeCompare(b.name))
           .map((m) => `- ${m.name} (import from "${m.import}"; source: ${m.source}, confidence: ${m.confidence})${m.description ? `: ${m.description}` : ""}`);
@@ -106,12 +113,12 @@ export function createServer(project: Project): McpServer {
     },
     ({ name }) =>
       run(() => {
-        const { manifests } = readContract(project);
+        const { manifests } = readContract(ws);
         const m = manifests.get(name) ?? [...manifests.values()].find((x) => x.name.toLowerCase() === name.toLowerCase());
         if (!m) {
           throw new KitError(`"${name}" isn't in the design kit. It has: ${[...manifests.keys()].sort().join(", ")}. If the design needs it, log a gap.`);
         }
-        const rulesPath = project.abs(`${LAYOUT.contract}/rules.md`);
+        const rulesPath = ws.abs(`${WORKSPACE_LAYOUT.contract}/rules.md`);
         const designRules = existsSync(rulesPath) ? rulesMentioning(readFileSync(rulesPath, "utf8"), m.name) : [];
         const { $schema: _s, mapping: _m, ...manifest } = m;
         return json(`${m.name}${designRules.length ? `\n\nDesign rules that mention it:\n${designRules.join("\n")}` : ""}`, manifest);
@@ -129,7 +136,7 @@ export function createServer(project: Project): McpServer {
     },
     ({ group }) =>
       run(() => {
-        const { tokens } = readContract(project);
+        const { tokens } = readContract(ws);
         const picked = tokens.filter((t) => !group || t.path === group || t.path.startsWith(`${group}.`));
         if (!picked.length) {
           const groups = [...new Set(tokens.map((t) => t.path.split(".")[0]))].join(", ");
@@ -157,9 +164,10 @@ export function createServer(project: Project): McpServer {
         from: step.optional().describe("An existing state that leads to this screen (adds an arrow in the flow)."),
         label: z.string().optional().describe('What the person does to get here, like "Continue".'),
         flow: z.string().optional().describe("Flow to add the arrow to; defaults to the flow that already has `from`."),
+        prototype: prototypeArg,
       },
     },
-    (args) => run(() => scaffolded(createScreen(project, args))),
+    (args) => run(() => scaffolded(createScreen(at(args.prototype), args))),
   );
 
   server.registerTool(
@@ -175,9 +183,10 @@ export function createServer(project: Project): McpServer {
         from: step.optional().describe("An existing state that leads to this one."),
         label: z.string().optional().describe('What happens to get here, like "Card expired".'),
         flow: z.string().optional(),
+        prototype: prototypeArg,
       },
     },
-    (args) => run(() => scaffolded(addState(project, args))),
+    (args) => run(() => scaffolded(addState(at(args.prototype), args))),
   );
 
   server.registerTool(
@@ -196,7 +205,7 @@ export function createServer(project: Project): McpServer {
     },
     (args) =>
       run(() => {
-        const r = addGap(project, args);
+        const r = addGap(at(listPrototypes(ws)[0]), args);
         return text(r.created ? `Logged gap ${r.gap.id}: ${r.gap.name}.` : `This is already logged as ${r.gap.id}; nothing new was added.`);
       }),
   );
@@ -205,11 +214,18 @@ export function createServer(project: Project): McpServer {
     "validate",
     {
       title: "Check the prototype",
-      description: "Checks the prototype against its design contract and returns plain-language problems with suggested fixes. Run it before finishing any building work.",
-      inputSchema: { files: z.array(z.string()).optional().describe("Only check these files (project-relative). Leave out to check everything.") },
+      description: "Checks a prototype against its design contract (with several prototypes and none named, checks the whole workspace) and returns plain-language problems with suggested fixes. Run it before finishing any building work.",
+      inputSchema: {
+        files: z.array(z.string()).optional().describe("Only check these files (relative to the prototype). Leave out to check everything."),
+        prototype: prototypeArg,
+      },
       annotations: { readOnlyHint: true },
     },
-    ({ files }) => run(() => text(formatResult(validate(project, files?.length ? { files } : {})))),
+    ({ files, prototype }) =>
+      run(() => {
+        if (!files?.length && !prototype && listPrototypes(ws).length > 1) return text(formatResult(validateWorkspace(ws)));
+        return text(formatResult(validate(at(prototype), files?.length ? { files } : {})));
+      }),
   );
 
   server.registerTool(
@@ -218,10 +234,14 @@ export function createServer(project: Project): McpServer {
       title: "Link to a screen state",
       description:
         "Where the person can see a screen state: its frame on the canvas, among the rest of the flow, and the state on its own. Give them the canvas link after building something.",
-      inputSchema: { step: z.string().describe('"{screen id}.{state}", or just a screen id for its default state.') },
+      inputSchema: { step: z.string().describe('"{screen id}.{state}", or just a screen id for its default state.'), prototype: prototypeArg },
       annotations: { readOnlyHint: true },
     },
-    ({ step: node }) => run(() => text(`On the canvas: ${canvasLink(project, node)}\nOn its own: ${stateLink(project, node)}`)),
+    ({ step: node, prototype }) =>
+      run(() => {
+        const project = at(prototype);
+        return text(`On the canvas: ${canvasLink(project, node)}\nOn its own: ${stateLink(project, node)}`);
+      }),
   );
 
   server.registerTool(
@@ -233,11 +253,12 @@ export function createServer(project: Project): McpServer {
       inputSchema: {
         step: z.string().describe('"{screen id}.{state}", like "checkout.payment.card-declined".'),
         status: z.enum(["exploring", "in-review", "approved", "handed-off"]),
+        prototype: prototypeArg,
       },
     },
-    ({ step: node, status }) =>
+    ({ step: node, status, prototype }) =>
       run(() => {
-        const r = setStatus(project, node, status);
+        const r = setStatus(at(prototype), node, status);
         return text(`${r.node} is now "${statusLabel(r.status)}" on the canvas (it was "${statusLabel(r.previous)}").`);
       }),
   );
@@ -252,10 +273,21 @@ export function createServer(project: Project): McpServer {
     },
     ({ message }) =>
       run(() => {
-        const r = saveVersion(project, message ? { message } : {});
+        const r = saveVersion(ws, message ? { message } : {});
         const problems = r.issues.length ? `\n\nOpen problems:\n${formatResult({ ok: false, issues: r.issues })}` : "";
         return text(`${r.message}${problems}`);
       }),
+  );
+
+  server.registerTool(
+    "list_prototypes",
+    {
+      title: "List prototypes",
+      description: "The prototypes in this design workspace (folders in prototypes/). They all share one design kit.",
+      inputSchema: {},
+      annotations: { readOnlyHint: true },
+    },
+    () => run(() => text(listPrototypes(ws).join("\n") || "No prototypes yet.")),
   );
 
   return server;

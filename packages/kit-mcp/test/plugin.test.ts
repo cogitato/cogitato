@@ -11,10 +11,10 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const repo = fileURLToPath(new URL("../../../", import.meta.url));
 const plugin = join(repo, "plugin");
-const templateDir = join(repo, "templates/prototype-react");
+const templateDir = join(repo, "templates/workspace-react");
 const readJson = (path: string) => JSON.parse(readFileSync(path, "utf8")) as Record<string, any>;
 const pluginPath = (p: string) => p.replace("${CLAUDE_PLUGIN_ROOT}", plugin);
-const TOOLS = ["add_state", "canvas_link", "create_screen", "get_component", "get_tokens", "list_components", "log_gap", "save_version", "set_status", "validate"];
+const TOOLS = ["add_state", "canvas_link", "create_screen", "get_component", "get_tokens", "list_components", "list_prototypes", "log_gap", "save_version", "set_status", "validate"];
 
 function frontmatter(text: string): Record<string, string> {
   const m = /^---\n([\s\S]*?)\n---\n/.exec(text.replace(/\r\n/g, "\n"));
@@ -78,7 +78,10 @@ describe("plugin launchers", () => {
   let other: string; // not a prototype at all
   beforeAll(() => {
     bare = mkdtempSync(join(tmpdir(), "cogitato-bare-"));
-    for (const part of ["src", "design"]) cpSync(join(templateDir, part), join(bare, part), { recursive: true });
+    for (const part of ["design", "kit", "package.json"]) cpSync(join(templateDir, part), join(bare, part), { recursive: true });
+    for (const part of ["src", "design", "package.json"]) {
+      cpSync(join(templateDir, "prototypes/checkout", part), join(bare, "prototypes/checkout", part), { recursive: true });
+    }
     other = mkdtempSync(join(tmpdir(), "cogitato-other-"));
   });
   afterAll(() => {
@@ -95,14 +98,14 @@ describe("plugin launchers", () => {
   };
 
   it("runs the prototype's own kit for the hooks", () => {
-    expect(hook("post-edit", templateDir, { tool_name: "Edit", tool_input: { file_path: join(templateDir, "src/mocks/cart.ts") } })).toBeUndefined();
+    expect(hook("post-edit", templateDir, { tool_name: "Edit", tool_input: { file_path: join(templateDir, "prototypes/checkout/src/mocks/cart.ts") } })).toBeUndefined();
     const start = hook("session-start", templateDir);
-    expect(start?.hookSpecificOutput.additionalContext).toContain("This is a Cogitato prototype: 4 screens, 8 states.");
+    expect(start?.hookSpecificOutput.additionalContext).toContain("This is a Cogitato design workspace with 1 prototype: checkout (4 screens, 8 states).");
   });
 
   it("offers setup when the prototype's parts aren't installed, and stays quiet elsewhere", () => {
     expect(hook("session-start", bare)?.systemMessage).toContain("Cogitato's tools aren't installed in this prototype yet");
-    expect(hook("post-edit", bare, { tool_input: { file_path: join(bare, "src/flows.ts") } })).toBeUndefined();
+    expect(hook("post-edit", bare, { tool_input: { file_path: join(bare, "prototypes/checkout/src/flows.ts") } })).toBeUndefined();
     expect(hook("session-start", other)).toBeUndefined();
   });
 
