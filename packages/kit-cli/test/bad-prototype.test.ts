@@ -30,6 +30,7 @@ describe("seeded bad prototypes", () => {
       "code-screen-not-static",
       "code-unknown-flow-step",
       "code-flows-stale",
+      "code-invalid-route",
     ]) {
       expect(codes, code).toContain(code);
     }

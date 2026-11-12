@@ -125,6 +125,9 @@ export function readScreen(sf: ts.SourceFile): { screen?: ScreenEntry; issues: I
         `"${id}" isn't a valid screen id. Screen ids are lowercase words separated by dots, like "checkout.payment".`),
     );
   }
+  if (route === "/") {
+    issues.push(issueAt("code-invalid-route", sf, getProperty(arg, "route")!.initializer, `The address "/" is the prototype's list of screens, so a screen can't use it. Pick another one, like "/home".`));
+  }
   if (route !== undefined && !route.startsWith("/")) {
     issues.push(
       issueAt("code-invalid-route", sf, getProperty(arg, "route")!.initializer, `The address "${route}" needs to start with "/", like "/checkout/payment".`),

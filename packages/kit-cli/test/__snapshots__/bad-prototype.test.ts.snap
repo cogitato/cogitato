@@ -110,6 +110,12 @@ exports[`seeded bad prototypes > missing-kit-id-native 1`] = `
 ]
 `;
 
+exports[`seeded bad prototypes > route-is-screen-list 1`] = `
+[
+  "[error] src/screens/basket/screen.tsx:5 The address "/" is the prototype's list of screens, so a screen can't use it. Pick another one, like "/home".",
+]
+`;
+
 exports[`seeded bad prototypes > screen-duplicate 1`] = `
 [
   "[error] src/screens/cart/screen.tsx:58 The screen id "cart" is already used by src/screens/basket/screen.tsx. Each screen needs its own id.",

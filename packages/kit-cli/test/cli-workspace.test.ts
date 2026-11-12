@@ -73,6 +73,7 @@ it("creates a new prototype that validates", () => {
   expect(pkg.name).toBe("onboarding");
   expect(pkg.dependencies["@cogitato/runtime"]).toBe(JSON.parse(readFileSync(ws.abs("prototypes/checkout/package.json"), "utf8")).dependencies["@cogitato/runtime"]);
   expect(existsSync(ws.abs("prototypes/onboarding/src/screens/home/screen.tsx"))).toBe(true);
+  expect(readFileSync(ws.abs("prototypes/onboarding/src/screens/home/screen.tsx"), "utf8")).toContain('route: "/home"');
   expect(r.files).toContain("prototypes/onboarding/src/flows.ts");
   expect(r.files).toContain("prototypes/onboarding/.env.example");
   expect(validateWorkspace(ws).issues.filter((i) => i.file.startsWith("prototypes/onboarding"))).toEqual([]);

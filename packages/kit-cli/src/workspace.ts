@@ -121,7 +121,7 @@ export function createPrototype(ws: Workspace, name: string): { name: string; fi
   writeFileSync(join(to, "src", "flows.ts"), EMPTY_FLOWS);
   files.push(`${WORKSPACE_LAYOUT.prototypes}/${name}/src/flows.ts`);
   const project = projectIn(ws, name);
-  const screen = createScreen(project, { id: "home", route: "/", title: "Home" });
+  const screen = createScreen(project, { id: "home", title: "Home" });
   files.push(...screen.files.map((f) => `${WORKSPACE_LAYOUT.prototypes}/${name}/${f}`));
   exportFlows(project);
   return { name, files };

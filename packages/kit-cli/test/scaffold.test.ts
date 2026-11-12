@@ -34,6 +34,9 @@ describe("createScreen", () => {
     expect(() => createScreen(project, { id: "cart" })).toThrow(/already a screen called "cart"/);
     expect(() => createScreen(project, { id: "Checkout Review" })).toThrow(KitError);
     expect(() => createScreen(project, { id: "basket", route: "/cart" })).toThrow(/already used by the Cart screen/);
+    expect(() => createScreen(project, { id: "basket", route: "/" })).toThrow(
+      `The address "/" is the prototype's list of screens, so a screen can't use it. Pick another one, like "/home".`,
+    );
     expect(() => createScreen(project, { id: "basket", route: "basket" })).toThrow(/needs to start with "\/"/);
     expect(() => createScreen(project, { id: "basket", from: "cart.missing" })).toThrow(/no state called "missing"/);
   });
