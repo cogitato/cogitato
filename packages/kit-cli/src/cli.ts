@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import mri from "mri";
 import { toReport } from "@cogitato/contract";
 import { doctor, formatDoctor } from "./doctor.js";
@@ -8,12 +9,13 @@ import { addGap } from "./gaps.js";
 import { runHook, type HookEvent } from "./hook.js";
 import { canvasLink, stateLink } from "./links.js";
 import { preview } from "./preview.js";
-import { findProject, type Project } from "./project.js";
+import { findWorkspace, listPrototypes, resolvePrototype, type Project, type Workspace } from "./project.js";
 import { saveVersion } from "./save.js";
 import { addEdge, addState, createScreen, type ScaffoldResult } from "./scaffold.js";
 import { takeSnapshots } from "./snapshots.js";
 import { FRAME_STATUSES, setStatus, statusLabel } from "./status.js";
-import { validate } from "./validate.js";
+import { sortIssues, validate } from "./validate.js";
+import { createPrototype, validateKit, validateWorkspace } from "./workspace.js";
 
 const HELP = `kit: Cogitato's prototype tools
 
@@ -25,6 +27,14 @@ const HELP = `kit: Cogitato's prototype tools
       Start the prototype if needed and open the design kit page.
   kit doctor [--json] [--quiet] [--port <n>]
       Check this machine is ready to run the prototype.
+  kit prototypes
+      List the prototypes in this workspace.
+  kit new-prototype <name>
+      Start a new prototype in prototypes/<name>, with the same setup as the others.
+  kit dev [name]
+      Run a prototype (the one you're in, or the only one) with its canvas.
+
+Commands that work on one prototype take --prototype <name> when you're at the workspace root.
 
   kit new-screen <screen id> [--title <t>] [--route </path>] [--from <step>] [--label <l>] [--flow <id>]
       Create a screen with a default state; --from adds an arrow to it.
@@ -53,11 +63,18 @@ const out = (text: string) => {
   if (text) process.stdout.write(text + "\n");
 };
 
-function project(): Project {
-  const p = findProject();
-  if (!p) throw new UsageError("This folder isn't a Cogitato prototype: there's no design/contract folder here or above it.");
-  return p;
+function workspace(): Workspace {
+  const ws = findWorkspace();
+  if (!ws) throw new UsageError("This folder isn't a Cogitato workspace: there's no design/contract folder here or above it.");
+  return ws;
 }
+
+function project(name?: string): Project {
+  return resolvePrototype(workspace(), name, process.cwd());
+}
+
+/** True when the working directory is inside one of the workspace's prototypes. */
+const findProjectHere = (ws: Workspace) => ws.rel(process.cwd()).startsWith("prototypes/");
 
 class UsageError extends Error {}
 
@@ -65,10 +82,12 @@ class UsageError extends Error {}
 export async function main(argv: string[]): Promise<number> {
   const args = mri(argv, {
     boolean: ["json", "contract", "check", "quiet", "help", "open", "canvas"],
-    string: ["files", "port", "title", "route", "from", "to", "label", "flow", "kind", "name", "context", "screen", "workaround", "message", "dist"],
+    string: ["files", "port", "title", "route", "from", "to", "label", "flow", "kind", "name", "context", "screen", "workaround", "message", "dist", "prototype"],
+    alias: { p: "prototype" },
     default: { open: true },
   });
   const [command, ...rest] = args._;
+  const proto = () => project(opt("prototype"));
   const port = args.port ? Number(args.port) : undefined;
   const opt = (key: string): string | undefined => (typeof args[key] === "string" && args[key] ? (args[key] as string) : undefined);
   const need = (value: unknown, what: string): string => {
@@ -88,12 +107,32 @@ ${HELP}`);
       case "validate": {
         // --files takes the following arguments too: `kit validate --files a.tsx b.css`.
         const files = args.files === undefined ? undefined : [args.files, ...rest].flat().map(String).filter(Boolean);
-        const r = validate(project(), { contractOnly: args.contract, ...(files ? { files } : {}) });
+        const ws = workspace();
+        const single = opt("prototype") || files || listPrototypes(ws).length === 1 || findProjectHere(ws);
+        let r = single ? validate(proto(), { contractOnly: args.contract, ...(files ? { files } : {}) }) : validateWorkspace(ws);
+        if (single && !files && !args.contract) {
+          // A prototype's build runs this from inside it: keep the shared kit checked too.
+          const issues = sortIssues([...r.issues, ...validateKit(ws)]);
+          r = { ok: !issues.some((i) => i.severity === "error"), issues };
+        }
         out(args.json ? JSON.stringify(toReport(r), null, 2) : formatResult(r));
         return r.ok ? 0 : 1;
       }
+      case "prototypes":
+        out(args.json ? JSON.stringify(listPrototypes(workspace())) : listPrototypes(workspace()).join("\n"));
+        return 0;
+      case "new-prototype": {
+        const r = createPrototype(workspace(), need(rest[0], "the prototype name"));
+        out(args.json ? JSON.stringify(r, null, 2) : `Started prototypes/${r.name} with a Home screen. Install its parts with pnpm install, then run it with pnpm dev ${r.name}.`);
+        return 0;
+      }
+      case "dev": {
+        const p = project(rest[0] === undefined ? opt("prototype") : String(rest[0]));
+        const r = spawnSync("pnpm", ["--filter", `./prototypes/${p.name}`, "dev"], { cwd: p.workspace.root, stdio: "inherit", shell: process.platform === "win32" });
+        return r.status ?? 2;
+      }
       case "export-flows": {
-        const r = exportFlows(project(), { check: args.check });
+        const r = exportFlows(proto(), { check: args.check });
         const result = { ok: !r.issues.some((i) => i.severity === "error"), issues: r.issues };
         if (args.json) out(JSON.stringify(toReport(result), null, 2));
         else if (!result.ok) out(formatResult(result) + "\n\nflows.json wasn't updated.");
@@ -102,27 +141,27 @@ ${HELP}`);
         return !result.ok || (args.check && r.changed) ? 1 : 0;
       }
       case "preview": {
-        const r = await preview(project(), { ...(port ? { port } : {}), open: args.open, log: out });
+        const r = await preview(proto(), { ...(port ? { port } : {}), open: args.open, log: out });
         if (r.server) {
           await new Promise<void>((resolve) => r.server!.on("exit", () => resolve()));
         }
         return 0;
       }
       case "doctor": {
-        const checks = await doctor(project(), port ? { port } : {});
+        const checks = await doctor(proto(), port ? { port } : {});
         out(args.json ? JSON.stringify(checks, null, 2) : formatDoctor(checks, args.quiet));
         return checks.some((c) => c.status === "problem") ? 1 : 0;
       }
       case "new-screen":
         return scaffolded(
-          createScreen(project(), {
+          createScreen(proto(), {
             id: need(rest[0], "the screen id"),
             title: opt("title"), route: opt("route"), from: opt("from"), label: opt("label"), flow: opt("flow"),
           }),
         );
       case "add-state":
         return scaffolded(
-          addState(project(), {
+          addState(proto(), {
             screen: need(rest[0], "the screen id"),
             state: need(rest[1], "the state name"),
             title: opt("title"), from: opt("from"), label: opt("label"), flow: opt("flow"),
@@ -130,7 +169,7 @@ ${HELP}`);
         );
       case "add-edge":
         return scaffolded(
-          addEdge(project(), { from: need(rest[0] ?? opt("from"), "the step to start from"), to: need(rest[1] ?? opt("to"), "the step to go to"), label: opt("label"), flow: opt("flow") }),
+          addEdge(proto(), { from: need(rest[0] ?? opt("from"), "the step to start from"), to: need(rest[1] ?? opt("to"), "the step to go to"), label: opt("label"), flow: opt("flow") }),
         );
       case "gap": {
         if (rest[0] !== "add") throw new UsageError(`Use "kit gap add".
@@ -138,7 +177,7 @@ ${HELP}`);
 ${HELP}`);
         const kind = need(opt("kind"), "--kind");
         if (kind !== "component" && kind !== "token" && kind !== "pattern") throw new UsageError("--kind is component, token or pattern.");
-        const r = addGap(project(), {
+        const r = addGap(proto(), {
           kind, name: need(opt("name"), "--name"), context: need(opt("context"), "--context"),
           screen: opt("screen"), workaround: opt("workaround"),
         });
@@ -146,24 +185,24 @@ ${HELP}`);
         return 0;
       }
       case "link": {
-        const link = (args.canvas ? canvasLink : stateLink)(project(), need(rest[0], "the step"), port);
+        const link = (args.canvas ? canvasLink : stateLink)(proto(), need(rest[0], "the step"), port);
         out(args.json ? JSON.stringify({ link }) : link);
         return 0;
       }
       case "status": {
-        const r = setStatus(project(), need(rest[0], "the step"), need(rest[1], `the status (${FRAME_STATUSES.join(", ")})`));
+        const r = setStatus(proto(), need(rest[0], "the step"), need(rest[1], `the status (${FRAME_STATUSES.join(", ")})`));
         out(args.json ? JSON.stringify(r) : `${r.node} is now "${statusLabel(r.status)}" (was "${statusLabel(r.previous)}").`);
         return 0;
       }
       case "snapshots": {
-        const r = await takeSnapshots(project(), { ...(opt("dist") ? { dist: opt("dist") } : {}), ...(port ? { port } : {}), log: out });
+        const r = await takeSnapshots(proto(), { ...(opt("dist") ? { dist: opt("dist") } : {}), ...(port ? { port } : {}), log: out });
         if (args.json) out(JSON.stringify(r, null, 2));
         else if (r.skipped) out(r.skipped);
         // Snapshots are a nice-to-have: never fail a build over them.
         return 0;
       }
       case "save": {
-        const r = saveVersion(project(), { message: opt("message") });
+        const r = saveVersion(proto(), { message: opt("message") });
         out(args.json ? JSON.stringify(r, null, 2) : r.message);
         return 0;
       }

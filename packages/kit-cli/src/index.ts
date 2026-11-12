@@ -20,7 +20,7 @@ export {
   type Project,
   type Workspace,
 } from "./project.js";
-export { validateWorkspace } from "./workspace.js";
+export { createPrototype, validateKit, validateWorkspace } from "./workspace.js";
 export { ID_PATTERNS, humanize, readFlows, readRegistry, readScreen, type Registry, type ScreenEntry } from "./registry.js";
 export { checkCssValue } from "./rules/css-values.js";
 export { validate, type ValidateOptions } from "./validate.js";

@@ -112,7 +112,7 @@ describe("kit CLI", () => {
       process.chdir(cwd);
       vi.restoreAllMocks();
     }
-    expect(written.join("")).toMatch(/isn't a Cogitato prototype/);
+    expect(written.join("")).toMatch(/isn't a Cogitato workspace/);
   });
 });
 
