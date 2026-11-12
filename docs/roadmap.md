@@ -25,7 +25,7 @@ Pick one **pilot product** with a known design system to use throughout Phases 1
 
 ## Phase 3 — Canvas + hosting
 - Canvas app, local mode then hosted mode ([07](architecture/components/07-canvas.md))
-- A design workspace per org, a folder per prototype ([ADR 017](decisions/017-multi-prototype-workspace.md)) — first, in the open packages (0.2.0)
+- A design workspace per org, a folder per prototype ([ADR 017](decisions/017-multi-prototype-workspace.md)) — first, in the open packages. Done: released as 0.2.0 on 2026-11-12
 - Hosted previews through the platform's GitHub App, built on AWS (platform ADR 001)
 
 **Exit:** a push to `acme-shop-demo/acme-design` produces a protected preview on our preview domain that loads as live frames at `/__canvas`, with no manual steps.

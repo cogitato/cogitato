@@ -39,7 +39,7 @@ Everything here runs on one person's machine and is free. Team features (a share
 3. [Roadmap](docs/roadmap.md) and [decisions](docs/decisions/)
 
 ## Status
-Phases 0–2 are built, and Phase 3's local canvas is too. The 0.1.0 packages are on npm as `@cogitato/*`, and the plugin installs from this repo's marketplace. Design workspaces (a folder per prototype, ADR 017) are the first step of Phase 3's hosted previews and ship as 0.2.0; the rest of Phase 3 is in progress. Phase 4 (comments and the team canvas, in the platform) follows.
+Phases 0–2 are built, and Phase 3's local canvas is too. The packages are on npm as `@cogitato/*` (0.2.0), and the plugin installs from this repo's marketplace. 0.2.0 brought design workspaces (a folder per prototype, ADR 017), the first step of Phase 3's hosted previews; the rest of Phase 3 (the preview builder, in the platform) is in progress. Phase 4 (comments and the team canvas, in the platform) follows.
 
 ## Develop
 See [CONTRIBUTING.md](CONTRIBUTING.md).
