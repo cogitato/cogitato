@@ -1,9 +1,10 @@
 import { spawnSync } from "node:child_process";
-import { readFileSync, rmSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { FlowManifest } from "@cogitato/contract";
-import { checkedByHook, describeChanges, postEditHook, projectAt, runHook, saveVersion, sessionStartHook, type Project } from "../src/index.js";
+import { checkedByHook, describeChanges, postEditHook, projectAt, runHook, saveVersion, sessionStartHook, workspaceAt, type Project } from "../src/index.js";
 import { applyOps, copyTemplate, removeTemplate } from "./helpers.js";
 
 let root: string;
@@ -67,7 +68,7 @@ describe("session-start hook", () => {
 });
 
 describe("saveVersion", () => {
-  const git = (...args: string[]) => spawnSync("git", args, { cwd: root, encoding: "utf8" }).stdout.trim();
+  const git = (...args: string[]) => spawnSync("git", args, { cwd: dirname(dirname(root)), encoding: "utf8" }).stdout.trim();
   const now = new Date("2026-11-02T10:00:00Z");
   beforeEach(() => {
     git("init", "-q", "-b", "main");
@@ -78,27 +79,61 @@ describe("saveVersion", () => {
   });
 
   it("reports when there's nothing to save", () => {
-    expect(saveVersion(project, { now })).toMatchObject({ saved: false, message: "Nothing new to save: everything is already saved." });
+    expect(saveVersion(project.workspace, { now })).toMatchObject({ saved: false, message: "Nothing new to save: everything is already saved." });
   });
 
   it("commits on a design branch with a message saying what changed", () => {
     applyOps(root, [{ op: "replace", file: "src/screens/cart/screen.tsx", find: 'empty: {', with: '"saved-for-later": { data: { cart: emptyCart } },\n    empty: {' }]);
-    const r = saveVersion(project, { now });
+    const r = saveVersion(project.workspace, { now });
     expect(r).toMatchObject({ saved: true, branch: "design/sam-designer-20261102", pushed: false, summary: "Add state cart.saved-for-later", issues: [] });
     expect(r.message).toMatch(/^Saved on this computer/);
     expect(git("log", "-1", "--format=%s")).toBe("Add state cart.saved-for-later");
     expect(git("status", "--porcelain")).toBe("");
     // flows.json was exported before committing.
-    expect(git("show", "HEAD:design/flows.json")).toContain("saved-for-later");
+    expect(git("show", "HEAD:prototypes/checkout/design/flows.json")).toContain("saved-for-later");
   });
 
   it("keeps the designer's own branch, and notes open problems without refusing to save", () => {
     git("switch", "-q", "-c", "design/checkout-ideas");
     writeFileSync(join(root, "src/styles/extra.css"), ".x { color: #123456; }\n");
-    const r = saveVersion(project, { now, message: "Try a darker accent" });
+    const r = saveVersion(project.workspace, { now, message: "Try a darker accent" });
     expect(r).toMatchObject({ saved: true, branch: "design/checkout-ideas", summary: "Try a darker accent" });
     expect(r.issues.map((i) => i.code)).toEqual(["code-hardcoded-color"]);
     expect(r.message).toContain("1 validation problem is still open");
+  });
+
+  it("links a preview for each prototype the branch changed", () => {
+    const proto = copyTemplate({ second: true });
+    const ws = dirname(dirname(proto));
+    const remote = mkdtempSync(join(tmpdir(), "cogitato-remote-"));
+    const g = (cwd: string, ...args: string[]) => spawnSync("git", args, { cwd, encoding: "utf8" });
+    try {
+      const pkgPath = join(ws, "package.json");
+      const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
+      writeFileSync(pkgPath, JSON.stringify({ ...pkg, kit: { previewUrl: "https://{host}.cogitato-preview.app", org: "acme" } }, null, 2));
+      g(remote, "init", "-q", "--bare", "-b", "main");
+      g(ws, "init", "-q", "-b", "main");
+      g(ws, "config", "user.name", "Sam Designer");
+      g(ws, "config", "user.email", "sam@example.com");
+      g(ws, "add", "-A");
+      g(ws, "commit", "-q", "-m", "start");
+      g(ws, "remote", "add", "origin", remote);
+      g(ws, "push", "-q", "-u", "origin", "main");
+      g(ws, "remote", "set-head", "origin", "main");
+
+      const screen = join(ws, "prototypes", "onboarding", "src", "screens", "cart", "screen.tsx");
+      writeFileSync(screen, readFileSync(screen, "utf8") + "\n// onboarding tweak\n");
+      const r = saveVersion(workspaceAt(ws), { now: new Date("2026-11-12T10:00:00Z") });
+
+      expect(r.pushed).toBe(true);
+      expect(r.previews).toEqual([
+        { prototype: "onboarding", url: "https://design-sam-designer-20261112--onboarding--acme.cogitato-preview.app/__canvas" },
+      ]);
+      expect(r.message).toContain(r.previews[0]!.url);
+    } finally {
+      rmSync(ws, { recursive: true, force: true });
+      rmSync(remote, { recursive: true, force: true });
+    }
   });
 });
 

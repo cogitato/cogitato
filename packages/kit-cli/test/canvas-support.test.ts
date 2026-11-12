@@ -4,7 +4,6 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { validateFormat, type FlowManifest } from "@cogitato/contract";
 import {
-  branchSlug,
   canvasLink,
   exportFlows,
   previewLink,
@@ -65,17 +64,17 @@ describe("links", () => {
     expect(canvasLink(project, "cart")).toBe("http://localhost:5173/__canvas?focus=cart.default");
   });
 
-  it("builds the hosted canvas for a branch from the prototype's previewUrl", () => {
-    expect(branchSlug("design/Sam_Designer-20261102")).toBe("design-sam-designer-20261102");
+  it("builds the hosted canvas for a branch from the workspace's previewUrl and org", () => {
     expect(previewLink(project, "design/sam-20261102")).toBeUndefined();
-    const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8")) as Record<string, unknown>;
-    writeFileSync(join(root, "package.json"), JSON.stringify({ ...pkg, kit: { previewUrl: "https://{branch}--acme-proto.netlify.app/" } }));
-    expect(previewLink(project, "design/sam-20261102", "cart.empty")).toBe("https://design-sam-20261102--acme-proto.netlify.app/__canvas?focus=cart.empty");
+    const wsPkg = join(root, "..", "..", "package.json");
+    const pkg = JSON.parse(readFileSync(wsPkg, "utf8")) as Record<string, unknown>;
+    writeFileSync(wsPkg, JSON.stringify({ ...pkg, kit: { previewUrl: "https://{host}.acme-proto.app/", org: "acme" } }));
+    expect(previewLink(project, "design/sam-20261102", "cart.empty")).toBe("https://design-sam-20261102--checkout--acme.acme-proto.app/__canvas?focus=cart.empty");
   });
 });
 
 describe("saving with review statuses and previews", () => {
-  const git = (...args: string[]) => spawnSync("git", args, { cwd: root, encoding: "utf8" }).stdout.trim();
+  const git = (...args: string[]) => spawnSync("git", args, { cwd: join(root, "..", ".."), encoding: "utf8" }).stdout.trim();
   beforeEach(() => {
     git("init", "-q", "-b", "main");
     git("config", "user.name", "Sam Designer");
@@ -86,7 +85,7 @@ describe("saving with review statuses and previews", () => {
 
   it("saves a status change and describes it", () => {
     setStatus(project, "checkout.payment.card-declined", "in-review");
-    const r = saveVersion(project, { now: new Date("2026-11-02T10:00:00Z") });
+    const r = saveVersion(project.workspace, { now: new Date("2026-11-02T10:00:00Z") });
     expect(r).toMatchObject({ saved: true, summary: "Mark checkout.payment.card-declined in review" });
   });
 
@@ -94,12 +93,13 @@ describe("saving with review statuses and previews", () => {
     const remote = join(root, "..", `remote-${Date.now()}.git`);
     spawnSync("git", ["init", "-q", "--bare", remote]);
     git("remote", "add", "origin", remote);
-    const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8")) as Record<string, unknown>;
-    writeFileSync(join(root, "package.json"), JSON.stringify({ ...pkg, kit: { previewUrl: "https://{branch}--acme-proto.netlify.app" } }));
-    const r = saveVersion(project, { now: new Date("2026-11-02T10:00:00Z") });
+    const wsPkg = join(root, "..", "..", "package.json");
+    const pkg = JSON.parse(readFileSync(wsPkg, "utf8")) as Record<string, unknown>;
+    writeFileSync(wsPkg, JSON.stringify({ ...pkg, kit: { previewUrl: "https://{host}.acme-proto.app", org: "acme" } }));
+    const r = saveVersion(project.workspace, { now: new Date("2026-11-02T10:00:00Z") });
     rmSync(remote, { recursive: true, force: true });
-    expect(r).toMatchObject({ pushed: true, preview: "https://design-sam-designer-20261102--acme-proto.netlify.app/__canvas" });
-    expect(r.message).toContain("Your preview will be at https://design-sam-designer-20261102--acme-proto.netlify.app/__canvas");
+    expect(r).toMatchObject({ pushed: true, previews: [{ prototype: "checkout", url: "https://design-sam-designer-20261102--checkout--acme.acme-proto.app/__canvas" }] });
+    expect(r.message).toContain("Your preview will be at https://design-sam-designer-20261102--checkout--acme.acme-proto.app/__canvas");
   });
 });
 

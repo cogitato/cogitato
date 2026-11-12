@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { DEFAULT_PORT } from "./doctor.js";
 import { KitError } from "./errors.js";
+import { previewHost } from "./hosting.js";
 import { sourceFiles, type Project } from "./project.js";
 import { readRegistry, type ScreenEntry } from "./registry.js";
 
@@ -38,25 +39,22 @@ export function canvasLink(project: Project, node: string, port = DEFAULT_PORT):
   return `http://localhost:${port}${CANVAS_PATH}?focus=${encodeURIComponent(`${screen.id}.${state}`)}`;
 }
 
-/** Netlify's form of a branch name in branch-deploy addresses: "design/sam-0102" -> "design-sam-0102". */
-export function branchSlug(branch: string): string {
-  return branch.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-}
-
 /**
- * Hosted canvas for a branch, from `"kit": { "previewUrl": "https://{branch}--site.netlify.app" }`
- * in the prototype's package.json. Undefined when the prototype has no hosting set up.
+ * Hosted canvas for a branch, from the workspace's package.json:
+ * `"kit": { "previewUrl": "https://{host}.cogitato-preview.app", "org": "acme-shop-demo" }`.
+ * `{host}` is previewHost(branch, prototype, org). Undefined when hosting isn't set up.
  */
 export function previewLink(project: Project, branch: string, node?: string): string | undefined {
-  const pkgPath = project.abs("package.json");
+  const pkgPath = project.workspace.abs("package.json");
   if (!existsSync(pkgPath)) return undefined;
-  let template: unknown;
+  let kit: { previewUrl?: unknown; org?: unknown } | undefined;
   try {
-    template = (JSON.parse(readFileSync(pkgPath, "utf8")) as { kit?: { previewUrl?: unknown } }).kit?.previewUrl;
+    kit = (JSON.parse(readFileSync(pkgPath, "utf8")) as { kit?: typeof kit }).kit;
   } catch {
     return undefined;
   }
-  if (typeof template !== "string" || !template.includes("{branch}")) return undefined;
-  const base = template.replace("{branch}", branchSlug(branch)).replace(/\/+$/, "");
+  if (typeof kit?.previewUrl !== "string" || !kit.previewUrl.includes("{host}") || typeof kit.org !== "string") return undefined;
+  const host = previewHost({ branch, prototype: project.name, org: kit.org });
+  const base = kit.previewUrl.replace("{host}", host).replace(/\/+$/, "");
   return `${base}${CANVAS_PATH}${node ? `?focus=${encodeURIComponent(node)}` : ""}`;
 }

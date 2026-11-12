@@ -205,7 +205,7 @@ ${HELP}`);
         return 0;
       }
       case "save": {
-        const r = saveVersion(proto(), { message: opt("message") });
+        const r = saveVersion(workspace(), { message: opt("message") });
         out(args.json ? JSON.stringify(r, null, 2) : r.message);
         return 0;
       }
