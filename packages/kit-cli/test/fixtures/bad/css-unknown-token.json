@@ -3,9 +3,9 @@
   "ops": [
     {
       "op": "replace",
-      "file": "src/kit/Button.module.css",
-      "find": "background: var(--kit-color-brand-700);",
-      "with": "background: var(--kit-color-brand-650);"
+      "file": "src/components/Page.module.css",
+      "find": "margin: 0 auto;",
+      "with": "margin: 0 auto;\n  background: var(--kit-color-brand-650);"
     }
   ],
   "expect": [

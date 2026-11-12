@@ -2,14 +2,16 @@ import { readFileSync } from "node:fs";
 import { validateProject, type ValidationResult } from "@cogitato/contract";
 import { buildManifest, staleIssue } from "./flows.js";
 import type { Issue } from "./issue.js";
-import { LAYOUT, isKitFile, isScreenFile, readContract, sourceFiles, type Project } from "./project.js";
+import { LAYOUT, WORKSPACE_LAYOUT, isScreenFile, readContract, sourceFiles, type Project } from "./project.js";
 import { parseProjectFile, readRegistry, type ScreenEntry } from "./registry.js";
 import { checkCssFile } from "./rules/css.js";
 import { checkTsxFile, duplicateKitIds, type KitIdUse } from "./rules/tsx.js";
 
 export interface ValidateOptions {
-  /** Only check the design contract (design/contract and the other design/ files). */
+  /** Only check the design contract (the workspace's design/contract and this prototype's design/ files). */
   contractOnly?: boolean;
+  /** Don't check the shared contract (validateWorkspace checks it once). */
+  skipContract?: boolean;
   /**
    * Only check these files (project-relative or absolute). The fast path for edit hooks.
    * Screen registrations and flows are still read from the whole project, since ids and flow
@@ -40,9 +42,16 @@ export function validate(project: Project, opts: ValidateOptions = {}): Validati
   const targets = opts.files?.map((f) => project.rel(f));
   const touches = (pred: (f: string) => boolean) => !targets || targets.some(pred);
 
-  if (touches((f) => f.startsWith(`${LAYOUT.design}/`))) {
-    const contractResult = validateProject(project.abs(LAYOUT.design));
-    issues.push(...contractResult.issues.map((i) => ({ ...i, file: `${LAYOUT.design}/${i.file}` })));
+  const sharedPrefix = `../../${WORKSPACE_LAYOUT.contract}/`;
+  if (touches((f) => f.startsWith(`${LAYOUT.design}/`) || f.startsWith(sharedPrefix))) {
+    const contractDir = project.workspace.abs(WORKSPACE_LAYOUT.contract);
+    const r = validateProject(project.abs(LAYOUT.design), contractDir);
+    for (const i of r.issues) {
+      const shared = i.file.startsWith("contract/");
+      if (shared && opts.skipContract) continue;
+      // Contract issues are named from the workspace root, prototype issues from the prototype.
+      issues.push({ ...i, file: shared ? `${WORKSPACE_LAYOUT.contract}/${i.file.slice("contract/".length)}` : `${LAYOUT.design}/${i.file}` });
+    }
   }
   if (opts.contractOnly) return finish(issues);
 
@@ -61,7 +70,7 @@ export function validate(project: Project, opts: ValidateOptions = {}): Validati
     // Every tsx file is read for its ids so duplicates across a screen's files are caught,
     // but only files in scope report their own problems.
     const isTsx = file.endsWith(".tsx");
-    if (!inScope(file) && (!isTsx || isKitFile(file))) continue;
+    if (!inScope(file) && !isTsx) continue;
     const r = checkTsxFile(parseProjectFile(project, file), { contract, owner: ownerOf(registry.screens, file) });
     kitIds.push(...r.kitIds);
     if (inScope(file)) issues.push(...r.issues);

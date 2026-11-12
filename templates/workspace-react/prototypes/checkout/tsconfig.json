@@ -11,7 +11,7 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "types": ["vite/client", "@cogitato/runtime/client"],
-    "paths": { "@/*": ["./src/*"] }
+    "paths": { "@/kit/*": ["../../kit/*"], "@/*": ["./src/*"] }
   },
-  "include": ["src", "vite.config.ts"]
+  "include": ["src", "../../kit", "vite.config.ts"]
 }

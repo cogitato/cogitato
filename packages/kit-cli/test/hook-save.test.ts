@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { FlowManifest } from "@cogitato/contract";
 import { checkedByHook, describeChanges, postEditHook, projectAt, runHook, saveVersion, sessionStartHook, type Project } from "../src/index.js";
-import { applyOps, copyTemplate } from "./helpers.js";
+import { applyOps, copyTemplate, removeTemplate } from "./helpers.js";
 
 let root: string;
 let project: Project;
@@ -12,7 +12,7 @@ beforeEach(() => {
   root = copyTemplate();
   project = projectAt(root);
 });
-afterEach(() => rmSync(root, { recursive: true, force: true }));
+afterEach(() => removeTemplate(root));
 
 const edit = (rel: string) => ({ hook_event_name: "PostToolUse", tool_name: "Edit", tool_input: { file_path: join(root, rel) } });
 
@@ -21,7 +21,7 @@ describe("post-edit hook", () => {
     expect(checkedByHook("src/screens/cart/screen.tsx")).toBe(true);
     expect(checkedByHook("src/styles/global.css")).toBe(true);
     expect(checkedByHook("design/contract/tokens.json")).toBe(true);
-    expect(checkedByHook("src/kit/Button.tsx")).toBe(false);
+    expect(checkedByHook("../../kit/Button.tsx")).toBe(false);
     expect(checkedByHook("README.md")).toBe(false);
     expect(checkedByHook("../elsewhere/screen.tsx")).toBe(false);
   });

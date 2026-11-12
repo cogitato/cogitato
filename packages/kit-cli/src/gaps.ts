@@ -2,9 +2,9 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { kebabCase, validateFormat, type Gap, type GapLog } from "@cogitato/contract";
 import { KitError } from "./errors.js";
-import { LAYOUT, type Project } from "./project.js";
+import { WORKSPACE_LAYOUT, type Project } from "./project.js";
 
-const FILE = `${LAYOUT.contract}/gaps.json`;
+const FILE = `${WORKSPACE_LAYOUT.contract}/gaps.json`;
 const SCHEMA = "../../node_modules/@cogitato/contract/schema/gaps.schema.json";
 
 export interface AddGapOptions {
@@ -27,13 +27,13 @@ export interface AddGapResult {
 }
 
 function gitUser(project: Project): string | undefined {
-  const r = spawnSync("git", ["config", "user.name"], { cwd: project.root, encoding: "utf8" });
+  const r = spawnSync("git", ["config", "user.name"], { cwd: project.workspace.root, encoding: "utf8" });
   return r.status === 0 && r.stdout.trim() ? r.stdout.trim() : undefined;
 }
 
 /** Records something the design needed that the contract doesn't have, in design/contract/gaps.json. */
 export function addGap(project: Project, opts: AddGapOptions): AddGapResult {
-  const path = project.abs(FILE);
+  const path = project.workspace.abs(FILE);
   let log: GapLog = { $schema: SCHEMA, gaps: [] };
   if (existsSync(path)) {
     try {

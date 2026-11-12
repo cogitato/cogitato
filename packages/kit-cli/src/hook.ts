@@ -2,7 +2,7 @@ import { isAbsolute } from "node:path";
 import { doctor, type DoctorOptions } from "./doctor.js";
 import { exportFlows } from "./export-flows.js";
 import { formatResult } from "./format.js";
-import { LAYOUT, findProject, isKitFile, isScreenFile, sourceFiles, type Project } from "./project.js";
+import { LAYOUT, findProject, isScreenFile, sourceFiles, type Project } from "./project.js";
 import { readRegistry } from "./registry.js";
 import { validate } from "./validate.js";
 
@@ -34,11 +34,11 @@ const FIX_ADVICE =
   "Fix these before finishing. If the design needs something the kit doesn't have, use the nearest token or kit component " +
   "and say so, or log a gap with the log_gap tool; don't hardcode values or build your own components.";
 
-/** Which files the edit hook checks: prototype source outside the kit, and the design/ folder. */
+/** Which files the edit hook checks: prototype source and the design/ folder. */
 export function checkedByHook(rel: string): boolean {
   if (rel.startsWith("..") || isAbsolute(rel)) return false;
   if (rel.startsWith(`${LAYOUT.design}/`)) return rel.endsWith(".json") || rel.endsWith(".md");
-  return rel.startsWith(`${LAYOUT.src}/`) && /\.(tsx?|css)$/.test(rel) && !rel.endsWith(".d.ts") && !isKitFile(rel);
+  return rel.startsWith(`${LAYOUT.src}/`) && /\.(tsx?|css)$/.test(rel) && !rel.endsWith(".d.ts");
 }
 
 /** After Claude writes or edits a file: keep flows.json fresh and send any problems back to Claude. */

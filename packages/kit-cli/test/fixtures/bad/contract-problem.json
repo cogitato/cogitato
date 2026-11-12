@@ -3,7 +3,7 @@
   "ops": [
     {
       "op": "replace",
-      "file": "design/contract/components/button.json",
+      "file": "../../design/contract/components/button.json",
       "find": "\"source\": \"production\"",
       "with": "\"source\": \"sketch\""
     }

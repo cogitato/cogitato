@@ -4,7 +4,23 @@ export { exportFlows, type ExportOptions } from "./export-flows.js";
 export { buildManifest, keptStatus, sameManifest, serializeManifest, type ExportResult } from "./flows.js";
 export { formatResult } from "./format.js";
 export { KIT_PATH, preview, type PreviewOptions, type PreviewResult } from "./preview.js";
-export { LAYOUT, findProject, projectAt, readContract, sourceFiles, type ContractView, type Project } from "./project.js";
+export {
+  LAYOUT,
+  WORKSPACE_LAYOUT,
+  findProject,
+  findWorkspace,
+  listPrototypes,
+  projectAt,
+  projectIn,
+  readContract,
+  resolvePrototype,
+  sourceFiles,
+  workspaceAt,
+  type ContractView,
+  type Project,
+  type Workspace,
+} from "./project.js";
+export { validateWorkspace } from "./workspace.js";
 export { ID_PATTERNS, humanize, readFlows, readRegistry, readScreen, type Registry, type ScreenEntry } from "./registry.js";
 export { checkCssValue } from "./rules/css-values.js";
 export { validate, type ValidateOptions } from "./validate.js";

@@ -3,9 +3,9 @@
   "ops": [
     {
       "op": "replace",
-      "file": "src/kit/Card.module.css",
-      "find": "background: var(--kit-color-surface-default);",
-      "with": "background: #fdfdfd;"
+      "file": "src/components/Page.module.css",
+      "find": "margin: 0 auto;",
+      "with": "margin: 0 auto;\n  background: #fdfdfd;"
     }
   ],
   "expect": [

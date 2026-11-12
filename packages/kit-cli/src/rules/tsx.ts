@@ -1,7 +1,7 @@
 import { posix } from "node:path";
 import ts from "typescript";
 import { issueAt, literalText, propertyName, type Issue } from "../issue.js";
-import { LAYOUT, isKitFile, type ContractView } from "../project.js";
+import { WORKSPACE_LAYOUT, type ContractView } from "../project.js";
 import { ID_PATTERNS, type ScreenEntry } from "../registry.js";
 import { FINDING_CODES, SUBSTITUTION, checkCssNumber, checkCssValue } from "./css-values.js";
 
@@ -22,13 +22,14 @@ export interface TsxContext {
 
 const NATIVE_INTERACTIVE = new Set(["button", "a", "input", "select", "textarea"]);
 
-/** Kit component name for an import specifier, or undefined if it doesn't point into src/kit. */
+/** Kit component name for an import specifier, or undefined if it doesn't point into the shared kit. */
 function kitImportName(file: string, specifier: string): string | undefined {
   let rest: string | undefined;
   if (specifier.startsWith("@/kit/")) rest = specifier.slice("@/kit/".length);
   else if (specifier.startsWith(".")) {
     const target = posix.normalize(posix.join(posix.dirname(file), specifier));
-    if (target.startsWith(`${LAYOUT.kit}/`)) rest = target.slice(LAYOUT.kit.length + 1);
+    const kit = `../../${WORKSPACE_LAYOUT.kit}/`;
+    if (target.startsWith(kit)) rest = target.slice(kit.length);
   }
   const name = rest?.split("/")[0]?.replace(/\.(tsx?|jsx?)$/, "");
   // Lowercase files and stylesheets in the kit folder are helpers, not components.
@@ -69,7 +70,6 @@ export function checkTsxFile(sf: ts.SourceFile, ctx: TsxContext): { issues: Issu
   const issues: Issue[] = [];
   const kitIds: KitIdUse[] = [];
   const file = sf.fileName;
-  const inKit = isKitFile(file);
   const { contract, owner } = ctx;
   // Local identifier -> kit component name, from this file's imports.
   const kitLocals = new Map<string, string>();
@@ -145,7 +145,7 @@ export function checkTsxFile(sf: ts.SourceFile, ctx: TsxContext): { issues: Issu
   const visit = (node: ts.Node) => {
     if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
       const name = kitImportName(file, node.moduleSpecifier.text);
-      if (name && !inKit) {
+      if (name) {
         if (!contract.manifests.has(name)) {
           issues.push(
             issueAt("code-unknown-component", sf, node, `${name} isn't in the design system yet, so it can't be used here. Use an existing component from the kit, or record it as a gap so the team can add it.`),
@@ -161,7 +161,7 @@ export function checkTsxFile(sf: ts.SourceFile, ctx: TsxContext): { issues: Issu
       }
     }
 
-    if ((ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) && !inKit) {
+    if ((ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node))) {
       const tag = node.tagName.getText(sf);
       const handlers = node.attributes.properties.some(
         (a) => ts.isJsxAttribute(a) && /^on[A-Z]/.test(a.name.getText(sf)),

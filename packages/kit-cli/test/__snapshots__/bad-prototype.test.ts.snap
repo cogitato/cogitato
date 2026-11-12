@@ -8,7 +8,7 @@ exports[`seeded bad prototypes > contract-problem 1`] = `
 
 exports[`seeded bad prototypes > css-hardcoded-color 1`] = `
 [
-  "[error] src/kit/Button.module.css:41 #2563eb is color.brand.600 (Brand Blue 600) in the palette. Use the token instead of typing the color, so it stays in sync with the design system. => var(--kit-color-brand-600)",
+  "[error] src/components/Page.module.css:4 #2563eb is color.brand.600 (Brand Blue 600) in the palette. Use the token instead of typing the color, so it stays in sync with the design system. => var(--kit-color-brand-600)",
 ]
 `;
 
@@ -21,13 +21,13 @@ exports[`seeded bad prototypes > css-hardcoded-size 1`] = `
 
 exports[`seeded bad prototypes > css-off-palette-color 1`] = `
 [
-  "[error] src/kit/Card.module.css:2 This color (#fdfdfd) isn't in the palette. Use color.surface.default instead; it's the closest match. => var(--kit-color-surface-default)",
+  "[error] src/components/Page.module.css:4 This color (#fdfdfd) isn't in the palette. Use color.surface.default instead; it's the closest match. => var(--kit-color-surface-default)",
 ]
 `;
 
 exports[`seeded bad prototypes > css-unknown-token 1`] = `
 [
-  "[error] src/kit/Button.module.css:46 var(--kit-color-brand-650) isn't a token in the design system. Check the spelling; did you mean var(--kit-color-brand-600)? => var(--kit-color-brand-600)",
+  "[error] src/components/Page.module.css:4 var(--kit-color-brand-650) isn't a token in the design system. Check the spelling; did you mean var(--kit-color-brand-600)? => var(--kit-color-brand-600)",
 ]
 `;
 

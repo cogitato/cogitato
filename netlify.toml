@@ -1,11 +1,11 @@
 # Netlify config for deploying the template prototype from this monorepo (the pilot).
-# Prototype repos made from the template use templates/prototype-react/netlify.toml instead.
+# Prototype repos made from the template use templates/workspace-react/prototypes/checkout/netlify.toml instead.
 # The `...` filter builds every workspace package the template depends on before the template.
 
 [build]
   base = "/"
-  command = "pnpm install --frozen-lockfile && npx playwright install chromium && pnpm --filter @cogitato/template-prototype-react... build"
-  publish = "templates/prototype-react/dist"
+  command = "pnpm install --frozen-lockfile && npx playwright install chromium && pnpm --filter @cogitato/template-checkout... build"
+  publish = "templates/workspace-react/prototypes/checkout/dist"
 
 [build.environment]
   NODE_VERSION = "22"

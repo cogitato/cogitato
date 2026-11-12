@@ -16,7 +16,7 @@ import {
   validate,
   type Project,
 } from "../src/index.js";
-import { applyOps, copyTemplate } from "./helpers.js";
+import { applyOps, copyTemplate, removeTemplate } from "./helpers.js";
 
 let root: string;
 let project: Project;
@@ -26,7 +26,7 @@ beforeEach(() => {
   root = copyTemplate();
   project = projectAt(root);
 });
-afterEach(() => rmSync(root, { recursive: true, force: true }));
+afterEach(() => removeTemplate(root));
 
 describe("setStatus", () => {
   it("records a state's review status in flows.json, and 'exploring' clears it", () => {

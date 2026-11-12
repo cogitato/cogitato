@@ -2,7 +2,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { validateProject } from "@cogitato/contract";
 import { buildManifest, readFlowsJson, sameManifest } from "./flows.js";
-import { LAYOUT, sourceFiles, type Project } from "./project.js";
+import { LAYOUT, WORKSPACE_LAYOUT, sourceFiles, type Project } from "./project.js";
 import { readRegistry } from "./registry.js";
 
 export type CheckStatus = "ok" | "warning" | "problem";
@@ -61,16 +61,16 @@ export async function doctor(project: Project, opts: DoctorOptions = {}): Promis
     );
   }
 
-  const installed = ["@cogitato/runtime", "@cogitato/contract", "@cogitato/kit-mcp"].every((p) =>
-    existsSync(project.abs(`node_modules/${p}/package.json`)),
-  );
+  const installed =
+    ["@cogitato/contract", "@cogitato/kit-mcp"].every((p) => existsSync(project.workspace.abs(`node_modules/${p}/package.json`))) &&
+    existsSync(project.abs("node_modules/@cogitato/runtime/package.json"));
   add(
     "dependencies",
     installed ? "ok" : "problem",
     installed ? "The prototype's parts are installed." : "The prototype's parts aren't installed yet. Run the setup (pnpm install) once.",
   );
 
-  const contract = validateProject(project.abs(LAYOUT.design));
+  const contract = validateProject(project.abs(LAYOUT.design), project.workspace.abs(WORKSPACE_LAYOUT.contract));
   const contractErrors = contract.issues.filter((i) => i.severity === "error").length;
   add(
     "contract",

@@ -4,7 +4,7 @@ import { KitError } from "./errors.js";
 import { exportFlows } from "./export-flows.js";
 import { sameManifest } from "./flows.js";
 import { previewLink } from "./links.js";
-import { LAYOUT, type Project } from "./project.js";
+import { LAYOUT, WORKSPACE_LAYOUT, type Project } from "./project.js";
 import { statusLabel } from "./status.js";
 import { validate } from "./validate.js";
 
@@ -71,7 +71,7 @@ function summarize(changes: string[], files: string[]): string {
   const screens = [...new Set(files.map((f) => /^src\/screens\/(.+)\/[^/]+$/.exec(f)?.[1]).filter(Boolean))];
   if (screens.length === 1) return `Update ${screens[0]!.split("/").join(".")}`;
   if (screens.length > 1) return `Update ${screens.length} screens`;
-  if (files.some((f) => f.startsWith(`${LAYOUT.contract}/`))) return "Update the design contract";
+  if (files.some((f) => f.includes(`${WORKSPACE_LAYOUT.contract}/`))) return "Update the design contract";
   return "Update the prototype";
 }
 
