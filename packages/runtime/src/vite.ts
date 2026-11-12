@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { createRequire } from "node:module";
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { basename, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import type { Connect, Plugin, ViteDevServer } from "vite";
 import { tokensToCss, type DesignTokens } from "@cogitato/contract/browser";
@@ -17,6 +17,7 @@ const slash = (p: string) => p.replace(/\\/g, "/");
 
 interface Paths {
   root: string;
+  workspace: string;
   contract: string;
   flowsJson: string;
   tokens: string;
@@ -24,15 +25,28 @@ interface Paths {
   kit: string;
 }
 
-function pathsFor(root: string): Paths {
-  const contract = join(root, "design", "contract");
+/** The workspace above a prototype: the nearest folder with design/contract. Falls back to the prototype itself. */
+function workspaceOf(root: string): string {
+  let dir = root;
+  for (;;) {
+    if (existsSync(join(dir, "design", "contract"))) return dir;
+    const parent = dirname(dir);
+    if (parent === dir) return root;
+    dir = parent;
+  }
+}
+
+export function pathsFor(root: string): Paths {
+  const workspace = workspaceOf(root);
+  const contract = join(workspace, "design", "contract");
   return {
     root,
+    workspace,
     contract,
     flowsJson: join(root, "design", "flows.json"),
     tokens: join(contract, "tokens.json"),
     components: join(contract, "components"),
-    kit: join(root, "src", "kit"),
+    kit: join(workspace, "kit"),
   };
 }
 
@@ -128,8 +142,9 @@ function canvasMiddleware(p: Paths): Connect.NextHandleFunction {
 }
 
 /**
- * Cogitato's Vite plugin. Adds the `@` → `src` alias, `virtual:kit/tokens.css` (token CSS
- * built from design/contract/tokens.json) and `virtual:kit/kit` (data for /__kit). For the
+ * Cogitato's Vite plugin. The design contract and the coded kit come from the workspace above
+ * the prototype. Adds the `@` → `src` and `@/kit/` → workspace kit aliases, `virtual:kit/tokens.css`
+ * (token CSS built from the workspace's design/contract/tokens.json) and `virtual:kit/kit` (data for /__kit). For the
  * canvas it serves /__kit-data/flows.json and /__kit-data/status in dev, and writes
  * __kit-data/flows.json into the build.
  */
@@ -149,11 +164,20 @@ export function kit(): Plugin {
     name: "kit",
     config(config) {
       p = pathsFor(config.root ? resolve(config.root) : process.cwd());
-      return { resolve: { alias: { "@": join(p.root, "src") } } };
+      return {
+        resolve: {
+          alias: [
+            { find: /^@\/kit\//, replacement: `${slash(p.kit)}/` },
+            { find: /^@\//, replacement: `${slash(join(p.root, "src"))}/` },
+          ],
+          dedupe: ["react", "react-dom"],
+        },
+        server: { fs: { allow: [p.workspace] } },
+      };
     },
     configureServer(s) {
       server = s;
-      s.watcher.add(p.contract);
+      s.watcher.add([p.contract, p.kit]);
       // Adding or removing a kit file or manifest changes the kit module's import list.
       s.watcher.on("add", reloadKit);
       s.watcher.on("unlink", reloadKit);

@@ -4,13 +4,13 @@
     {
       "name": "prototype",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@cogitato/template-prototype-react", "dev"],
+      "runtimeArgs": ["--filter", "@cogitato/template-checkout", "dev"],
       "port": 5173
     },
     {
       "name": "prototype-build",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@cogitato/template-prototype-react", "exec", "vite", "preview", "--port", "4173", "--strictPort"],
+      "runtimeArgs": ["--filter", "@cogitato/template-checkout", "exec", "vite", "preview", "--port", "4173", "--strictPort"],
       "port": 4173
     }
   ]
