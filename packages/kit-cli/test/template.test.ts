@@ -120,7 +120,6 @@ describe("Netlify config", () => {
   // No TOML parser here: these check the lines a preview deploy depends on.
   const configs = {
     template: readFileSync(join(templateDir, "netlify.toml"), "utf8"),
-    monorepo: readFileSync(join(workspaceDir, "..", "..", "netlify.toml"), "utf8"),
   };
 
   it.each(Object.entries(configs))("%s: serves every route from the app and lets only its own canvas frame it", (_name, toml) => {
@@ -129,9 +128,8 @@ describe("Netlify config", () => {
     expect(toml).toMatch(/npx playwright install chromium/);
   });
 
-  it("builds the template and everything it depends on from the monorepo", () => {
-    expect(configs.monorepo).toMatch(/pnpm --filter @cogitato\/template-checkout... build/);
-    expect(configs.monorepo).toMatch(/publish = "templates\/workspace-react\/prototypes\/checkout\/dist"/);
+  it("builds the prototype from its own folder, for self-hosting", () => {
+    expect(configs.template).toMatch(/command = "npx playwright install chromium && pnpm build"/);
     expect(configs.template).toMatch(/publish = "dist"/);
   });
 });

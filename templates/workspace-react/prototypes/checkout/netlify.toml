@@ -1,4 +1,5 @@
-# Netlify config for a Cogitato prototype repo (ADR 013). Every branch push gets a preview whose
+# Netlify config for self-hosting a Cogitato prototype (ADR 013). Create one Netlify site per
+# prototype and set its base directory to prototypes/<name>. Every branch push gets a preview whose
 # canvas is at /__canvas. Snapshots need Chromium; if it can't run, the build still succeeds and
 # the canvas shows placeholders.
 
