@@ -175,6 +175,60 @@ describe("saveVersion", () => {
   });
 });
 
+describe("saveVersion previews on other default branches", () => {
+  const g = (cwd: string, ...args: string[]) => spawnSync("git", args, { cwd, encoding: "utf8" });
+  let ws: string;
+  let remote: string;
+  /** A two-prototype workspace with hosting set up, pushed to a bare remote on `branch` (no origin/HEAD). */
+  const setUp = (branch: string) => {
+    ws = dirname(dirname(copyTemplate({ second: true })));
+    remote = mkdtempSync(join(tmpdir(), "cogitato-remote-"));
+    const pkgPath = join(ws, "package.json");
+    const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
+    writeFileSync(pkgPath, JSON.stringify({ ...pkg, kit: { previewUrl: "https://{host}.cogitato-preview.app", org: "acme" } }, null, 2));
+    g(remote, "init", "-q", "--bare", "-b", branch);
+    g(ws, "init", "-q", "-b", branch);
+    g(ws, "config", "user.name", "Sam Designer");
+    g(ws, "config", "user.email", "sam@example.com");
+    g(ws, "add", "-A");
+    g(ws, "commit", "-q", "-m", "start");
+    g(ws, "remote", "add", "origin", remote);
+    g(ws, "push", "-q", "-u", "origin", branch);
+  };
+  const touch = (rel: string) => writeFileSync(join(ws, rel), readFileSync(join(ws, rel), "utf8") + "\n/* tweak */\n");
+  const url = (name: string) => `https://design-sam-designer-20261112--${name}--acme.cogitato-preview.app/__canvas`;
+  const now = new Date("2026-11-12T10:00:00Z");
+  afterEach(() => {
+    rmSync(ws, { recursive: true, force: true });
+    rmSync(remote, { recursive: true, force: true });
+  });
+
+  it("finds master as the default branch when the remote doesn't name one", () => {
+    setUp("master");
+    expect(g(ws, "symbolic-ref", "refs/remotes/origin/HEAD").status).not.toBe(0);
+    touch("prototypes/onboarding/src/styles/global.css");
+    const r = saveVersion(workspaceAt(ws), { now });
+    expect(r.pushed).toBe(true);
+    expect(r.previews).toEqual([{ prototype: "onboarding", url: url("onboarding") }]);
+  });
+
+  it("links every prototype when it can't tell what the branch changed", () => {
+    setUp("trunk");
+    touch("prototypes/onboarding/src/styles/global.css");
+    const r = saveVersion(workspaceAt(ws), { now });
+    expect(r.previews.map((p) => p.prototype)).toEqual(["checkout", "onboarding"]);
+  });
+
+  it("names several prototypes' changes and ends the list of previews with a full stop", () => {
+    setUp("main");
+    touch("prototypes/checkout/src/styles/global.css");
+    touch("prototypes/onboarding/src/styles/global.css");
+    const r = saveVersion(workspaceAt(ws), { now });
+    expect(r.summary).toBe("Update the prototypes");
+    expect(r.message).toContain(`checkout: ${url("checkout")}; onboarding: ${url("onboarding")}. Version: "Update the prototypes".`);
+  });
+});
+
 describe("describeChanges", () => {
   it("lists added and removed screens and states", () => {
     const m = (screens: Record<string, string[]>): FlowManifest =>

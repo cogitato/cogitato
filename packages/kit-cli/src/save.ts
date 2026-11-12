@@ -5,7 +5,7 @@ import { exportFlows } from "./export-flows.js";
 import { sameManifest } from "./flows.js";
 import { affectedPrototypes } from "./hosting.js";
 import { previewLink } from "./links.js";
-import { listPrototypes, projectIn, type Workspace } from "./project.js";
+import { LAYOUT, WORKSPACE_LAYOUT, listPrototypes, projectIn, type Workspace } from "./project.js";
 import { statusLabel } from "./status.js";
 import { validateWorkspace } from "./workspace.js";
 
@@ -40,7 +40,7 @@ function git(ws: Workspace, args: string[], raw = false): { ok: boolean; out: st
   return { ok: r.status === 0, out: raw ? (r.stdout ?? "") : (r.stdout ?? "").trim(), err: (r.stderr ?? "").trim() };
 }
 
-const flowsPath = (name: string) => `prototypes/${name}/design/flows.json`;
+const flowsPath = (name: string) => `${WORKSPACE_LAYOUT.prototypes}/${name}/${LAYOUT.flowsJson}`;
 
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "designer";
 
@@ -81,20 +81,25 @@ function summarize(changes: string[], files: string[], multiple: boolean): strin
   ];
   if (screens.length === 1) return `Update ${screens[0]}`;
   if (screens.length > 1) return `Update ${screens.length} screens`;
-  if (files.some((f) => f.startsWith("design/contract/") || f.startsWith("kit/"))) return "Update the design kit";
-  return "Update the prototype";
+  if (files.some((f) => f.startsWith(`${WORKSPACE_LAYOUT.contract}/`) || f.startsWith(`${WORKSPACE_LAYOUT.kit}/`))) return "Update the design kit";
+  const touched = new Set(files.map((f) => new RegExp(`^${WORKSPACE_LAYOUT.prototypes}/([^/]+)/`).exec(f)?.[1]).filter(Boolean));
+  return touched.size > 1 ? "Update the prototypes" : "Update the prototype";
 }
 
-function defaultBranch(ws: Workspace, remote: string): string {
+/** The branch design branches start from: the remote's HEAD, else main or master. Undefined if none exists. */
+function defaultBranch(ws: Workspace, remote: string): string | undefined {
   const head = git(ws, ["symbolic-ref", "--short", `refs/remotes/${remote}/HEAD`]);
-  if (head.ok && head.out) return head.out;
-  return git(ws, ["rev-parse", "--verify", "--quiet", `${remote}/main`]).ok ? `${remote}/main` : "main";
+  const candidates = [...(head.ok && head.out ? [head.out] : []), `${remote}/main`, `${remote}/master`, "main", "master"];
+  return candidates.find((ref) => git(ws, ["rev-parse", "--verify", "--quiet", `${ref}^{commit}`]).ok);
 }
 
 function previewsFor(ws: Workspace, remote: string, branch: string): { prototype: string; url: string }[] {
-  const diff = git(ws, ["diff", "--name-only", `${defaultBranch(ws, remote)}...HEAD`]);
-  const changed = diff.ok ? diff.out.split("\n").filter(Boolean) : [];
-  return affectedPrototypes(changed, listPrototypes(ws)).flatMap((name) => {
+  const names = listPrototypes(ws);
+  const base = defaultBranch(ws, remote);
+  const diff = base ? git(ws, ["diff", "--name-only", `${base}...HEAD`]) : undefined;
+  // When it's unclear what the branch changed, link every prototype rather than none.
+  const affected = diff?.ok ? affectedPrototypes(diff.out.split("\n").filter(Boolean), names) : names;
+  return affected.flatMap((name) => {
     const url = previewLink(projectIn(ws, name), branch);
     return url ? [{ prototype: name, url }] : [];
   });
@@ -129,8 +134,8 @@ export function saveVersion(ws: Workspace, opts: SaveOptions = {}): SaveResult {
       const before = name && previous.get(name);
       const stampOnly = !!(name && before && sameManifest(before, manifests.get(name)!, { status: true }));
       // Put the saved copy back, so the stamp doesn't ride along in the commit and mark the prototype as changed.
-      if (stampOnly) git(ws, ["checkout", "--", f]);
-      return !stampOnly;
+      // If that fails, the file just goes into the save.
+      return !(stampOnly && git(ws, ["checkout", "HEAD", "--", f]).ok);
     });
   const issues = validateWorkspace(ws).issues.filter((i) => i.severity === "error");
   if (!files.length) return { saved: false, pushed: false, previews: [], message: "Nothing new to save: everything is already saved.", issues };
@@ -176,7 +181,7 @@ export function saveVersion(ws: Workspace, opts: SaveOptions = {}): SaveResult {
   }
   const previews = pushed && remote ? previewsFor(ws, remote, branch) : [];
   if (previews.length === 1) where += ` Your preview will be at ${previews[0]!.url} in a minute or two.`;
-  else if (previews.length > 1) where += ` Your previews will be ready in a minute or two: ${previews.map((p) => `${p.prototype}: ${p.url}`).join("; ")}`;
+  else if (previews.length > 1) where += ` Your previews will be ready in a minute or two: ${previews.map((p) => `${p.prototype}: ${p.url}`).join("; ")}.`;
   const problems = issues.length ? ` Heads up: ${issues.length} validation problem${issues.length === 1 ? " is" : "s are"} still open.` : "";
   return { saved: true, branch, commit: sha, summary, pushed, previews, message: `${where} Version: "${summary}".${problems}`, issues };
 }

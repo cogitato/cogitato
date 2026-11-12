@@ -69,10 +69,15 @@ describe("createWorkspace", () => {
       vi.stubEnv(`GIT_${who}_NAME`, "Test Designer");
       vi.stubEnv(`GIT_${who}_EMAIL`, "designer@example.com");
     }
+    // Even when this computer's git starts new histories on another branch.
+    vi.stubEnv("GIT_CONFIG_COUNT", "1");
+    vi.stubEnv("GIT_CONFIG_KEY_0", "init.defaultBranch");
+    vi.stubEnv("GIT_CONFIG_VALUE_0", "master");
     tmp = mkdtempSync(join(tmpdir(), "create-cogitato-"));
     const r = createWorkspace({ target: join(tmp, "p"), install: false });
     expect(r.git).toBe("committed");
     expect(existsSync(join(r.dir, ".git"))).toBe(true);
+    expect(execFileSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], { cwd: r.dir, encoding: "utf8" }).trim()).toBe("main");
   });
 
   it("refuses a folder that already has files", () => {

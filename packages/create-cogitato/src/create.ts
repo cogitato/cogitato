@@ -77,7 +77,8 @@ export function createWorkspace(opts: CreateOptions): CreateResult {
 
   let git: CreateResult["git"] = "skipped";
   if (opts.git !== false && has("git")) {
-    if (run("git", ["init", "-q"], dir)) {
+    // Old git has no -b: then it starts on its own default branch, which saving copes with.
+    if (run("git", ["init", "-q", "-b", "main"], dir) || run("git", ["init", "-q"], dir)) {
       git = "initialized";
       if (run("git", ["add", "-A"], dir) && run("git", ["commit", "-q", "-m", "Start the design workspace from Cogitato"], dir)) git = "committed";
       // Usually git doesn't know your name and email yet. Saving a version later sorts it out.
