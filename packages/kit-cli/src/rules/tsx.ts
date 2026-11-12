@@ -18,6 +18,8 @@ export interface TsxContext {
   contract: ContractView;
   /** The screen whose folder contains this file, if any. */
   owner?: ScreenEntry;
+  /** True for a file in the shared kit: screen-only rules (kit imports, data-kit-id on elements) don't apply. */
+  inKit?: boolean;
 }
 
 const NATIVE_INTERACTIVE = new Set(["button", "a", "input", "select", "textarea"]);
@@ -71,6 +73,7 @@ export function checkTsxFile(sf: ts.SourceFile, ctx: TsxContext): { issues: Issu
   const kitIds: KitIdUse[] = [];
   const file = sf.fileName;
   const { contract, owner } = ctx;
+  const inKit = ctx.inKit === true;
   // Local identifier -> kit component name, from this file's imports.
   const kitLocals = new Map<string, string>();
 
@@ -145,7 +148,7 @@ export function checkTsxFile(sf: ts.SourceFile, ctx: TsxContext): { issues: Issu
   const visit = (node: ts.Node) => {
     if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
       const name = kitImportName(file, node.moduleSpecifier.text);
-      if (name) {
+      if (name && !inKit) {
         if (!contract.manifests.has(name)) {
           issues.push(
             issueAt("code-unknown-component", sf, node, `${name} isn't in the design system yet, so it can't be used here. Use an existing component from the kit, or record it as a gap so the team can add it.`),
@@ -161,7 +164,7 @@ export function checkTsxFile(sf: ts.SourceFile, ctx: TsxContext): { issues: Issu
       }
     }
 
-    if ((ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node))) {
+    if ((ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) && !inKit) {
       const tag = node.tagName.getText(sf);
       const handlers = node.attributes.properties.some(
         (a) => ts.isJsxAttribute(a) && /^on[A-Z]/.test(a.name.getText(sf)),

@@ -82,7 +82,11 @@ export function projectIn(ws: Workspace, name: string): Project {
 export function projectAt(root: string): Project {
   const ws = findWorkspace(root);
   if (!ws) throw new KitError(`${root} isn't inside a Cogitato workspace (there's no design/contract folder above it).`);
-  return projectIn(ws, basename(resolve(root)));
+  const name = basename(resolve(root));
+  if (resolve(root) !== resolve(ws.abs(`${WORKSPACE_LAYOUT.prototypes}/${name}`))) {
+    throw new KitError(`${root} isn't a prototype folder. Prototypes live in ${WORKSPACE_LAYOUT.prototypes}/<name> inside the workspace.`);
+  }
+  return projectIn(ws, name);
 }
 
 /** The prototype `from` is inside, or the workspace's only prototype. Undefined if it's unclear. */
@@ -141,8 +145,8 @@ function readJson<T>(path: string): T | undefined {
   }
 }
 
-export function readContract(project: Project): ContractView {
-  const ws = project.workspace;
+export function readContract(from: Workspace | Project): ContractView {
+  const ws = "workspace" in from ? from.workspace : from;
   const tokensJson = readJson<DesignTokens>(ws.abs(`${WORKSPACE_LAYOUT.contract}/tokens.json`));
   let tokens: ResolvedToken[] = [];
   let cssVars = new Set<string>();

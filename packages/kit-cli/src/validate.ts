@@ -25,7 +25,7 @@ const ownerOf = (screens: ScreenEntry[], file: string): ScreenEntry | undefined 
     .filter((s) => file.startsWith(`${s.dir}/`))
     .sort((a, b) => b.dir.length - a.dir.length)[0];
 
-function sortIssues(issues: Issue[]): Issue[] {
+export function sortIssues(issues: Issue[]): Issue[] {
   return [...issues].sort(
     (a, b) => a.file.localeCompare(b.file) || (a.line ?? 0) - (b.line ?? 0) || (a.column ?? 0) - (b.column ?? 0),
   );

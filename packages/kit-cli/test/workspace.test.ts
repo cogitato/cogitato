@@ -1,7 +1,7 @@
 import { rmSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { KitError, findProject, findWorkspace, listPrototypes, readContract, resolvePrototype, validateWorkspace } from "../src/index.js";
+import { KitError, findProject, projectAt, findWorkspace, listPrototypes, readContract, resolvePrototype, validateWorkspace } from "../src/index.js";
 import { applyOps, copyTemplate, templateDir, workspaceDir } from "./helpers.js";
 
 let proto: string | undefined;
@@ -61,5 +61,34 @@ describe("validateWorkspace", () => {
     expect(files).toContain("prototypes/onboarding");
     expect(files.filter((f) => f.startsWith("design/")).length).toBe(1);
     expect(files).not.toContain("prototypes/checkout");
+  });
+
+  it("checks the shared kit's styles once, with workspace-relative paths", () => {
+    proto = copyTemplate({ second: true });
+    applyOps(proto, [{ op: "replace", file: "../../kit/Button.module.css", find: "background: var(--kit-color-brand-600);", with: "background: #2563eb;" }]);
+    const r = validateWorkspace(findWorkspace(proto)!);
+    const hits = r.issues.filter((i) => i.file === "kit/Button.module.css");
+    expect(hits).toHaveLength(1);
+    expect(hits[0]?.code).toBe("code-hardcoded-color");
+    expect(r.ok).toBe(false);
+  });
+
+  it("checks the shared kit's code, but not screen-only rules", () => {
+    proto = copyTemplate();
+    applyOps(proto, [
+      { op: "replace", file: "../../kit/Button.tsx", find: "aria-busy={loading || undefined}", with: 'aria-busy={loading || undefined} style={{ color: "red" }}' },
+    ]);
+    const r = validateWorkspace(findWorkspace(proto)!);
+    expect(r.issues.map((i) => [i.file, i.code])).toEqual([["kit/Button.tsx", "code-hardcoded-color"]]);
+  });
+});
+
+describe("projectAt", () => {
+  it("accepts a prototype folder and rejects anything else", () => {
+    proto = copyTemplate();
+    expect(projectAt(proto).name).toBe("checkout");
+    const ws = findWorkspace(proto)!;
+    expect(() => projectAt(join(ws.root, "design", "checkout"))).toThrow(KitError);
+    expect(() => projectAt(join(proto, "src"))).toThrow(KitError);
   });
 });
