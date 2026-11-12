@@ -6,7 +6,7 @@
 The Figma-like overview: every screen and state as a live, interactive frame, laid out as flows.
 
 ## Behavior
-- Reads `flows.json` from a base URL (local dev server or Netlify preview).
+- Reads `flows.json` from a base URL (local dev server or hosted preview).
 - Renders each state as an iframe at `{route}?fixture=..&kit-frame=1`.
 - Zoomed out: static snapshots. Zoomed in or clicked: frame becomes live. (Performance with dozens of frames.)
 - Flow edges drawn as arrows between frames.

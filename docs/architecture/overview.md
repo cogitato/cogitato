@@ -15,7 +15,7 @@ Working name: **Cogitato**.
 3. **Enforce, don't ask.** Rules live in hooks and validators, not just in prompts.
 4. **Designers never see the machinery.** No terminal, no git, no dev server management.
 5. **Plain files, in git.** Contracts, fixtures, flows and specs are files in the prototype repo. Only live comments live in a service.
-6. **Claude Code first, local only.** v1 targets teams with Claude and Claude Code, running locally in the desktop app. Hosting is separate (Netlify or similar).
+6. **Claude Code first, local only.** v1 targets teams with Claude and Claude Code, running locally in the desktop app. Hosting is separate: the Cogitato platform builds and hosts previews.
 
 ## System map
 
@@ -43,7 +43,7 @@ flowchart LR
 
   CLI[kit CLI: validate, preview, export]
 
-  subgraph Hosted["Hosted (Netlify)"]
+  subgraph Hosted["Hosted (Cogitato platform)"]
     Preview[Branch preview deploys]
     Canvas[Canvas app]
   end
@@ -89,7 +89,7 @@ flowchart LR
 1. Developer installs the plugin and runs intake → contract + prototype repo.
 2. Designer opens prototype repo in Claude Code → builds screens via skills; hooks run `kit validate` after every edit.
 3. `kit export-flows` writes `design/flows.json` (screens, states, flow edges).
-4. Save version → push branch → Netlify preview deploy.
+4. Save version → push branch → the platform builds a preview of each changed prototype.
 5. Canvas reads the preview's `flows.json` and renders each state as a live frame.
 6. Reviewers comment on elements (anchored by `data-kit-id`); comments live in the comment service.
 7. Prepare handoff → spec + resolved annotations → PR.

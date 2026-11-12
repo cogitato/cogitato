@@ -24,7 +24,7 @@ it("builds the hosted canvas link from the workspace's previewUrl and org", () =
 it("has no link without hosting set up", () => {
   proto = copyTemplate();
   expect(previewLink(projectAt(proto), "main")).toBeUndefined();
-  setKit(dirname(dirname(proto)), { previewUrl: "https://{branch}--x.netlify.app" });
+  setKit(dirname(dirname(proto)), { previewUrl: "https://{branch}--x.example.app" });
   expect(previewLink(projectAt(proto), "main")).toBeUndefined();
 });
 

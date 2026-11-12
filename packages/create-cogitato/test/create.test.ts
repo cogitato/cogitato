@@ -43,7 +43,7 @@ describe("createWorkspace", () => {
     tmp = mkdtempSync(join(tmpdir(), "create-cogitato-"));
     const r = createWorkspace({ target: join(tmp, "Checkout Ideas"), install: false, git: false });
     expect(r).toMatchObject({ name: "checkout-ideas", installed: false, git: "skipped" });
-    for (const f of [".gitignore", ".claude/settings.json", "design/contract/tokens.json", "kit", "prototypes/checkout/src/flows.ts", "prototypes/checkout/netlify.toml", "CLAUDE.md"]) {
+    for (const f of [".gitignore", ".claude/settings.json", "design/contract/tokens.json", "kit", "prototypes/checkout/src/flows.ts", "CLAUDE.md"]) {
       expect(existsSync(join(r.dir, f)), f).toBe(true);
     }
     expect((JSON.parse(readFileSync(join(r.dir, "package.json"), "utf8")) as { name: string }).name).toBe("checkout-ideas");

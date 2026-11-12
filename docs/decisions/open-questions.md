@@ -10,7 +10,7 @@ Decisions needed before or during each phase. Leanings are proposals, not commit
 | 4 | Flow edge declaration | Phase 1 | Co-located with screens, separate `flows.ts` | **Decided: separate `src/flows.ts`, read statically** ([ADR 007](007-screen-and-flow-registration.md)) |
 | 5 | Plugin marketplace | Phase 2 | Private team repo, public marketplace | **Decided: this repo is the marketplace, a private GitHub repo for the pilot** ([ADR 009](009-plugin-distribution.md)) |
 | 6 | Canvas library | Phase 3 | React Flow, tldraw (check license), custom | **Decided: React Flow, canvas at `/__canvas` in every prototype** ([ADR 012](012-canvas.md)) |
-| 7 | Hosting | Phase 3 | Netlify, Vercel | **Decided: Netlify branch previews** ([ADR 013](013-hosting.md)). Configured; first real deploy pending |
+| 7 | Hosting | Phase 3 | Netlify, Vercel | **Decided: the platform builds and hosts previews on AWS** (platform ADR 001). Netlify ([ADR 013](013-hosting.md)) is superseded |
 | 8 | Comment backend | Phase 4 | Liveblocks, Supabase, Yjs self-hosted | Evaluate in a spike |
 | 9 | Auth | Phase 4 | GitHub OAuth, team SSO | GitHub OAuth |
 | 10 | Figma access in intake | Phase 5 | Figma connector/MCP, exported JSON, screenshots | Connector if available, JSON fallback |

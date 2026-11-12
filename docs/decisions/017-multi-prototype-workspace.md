@@ -30,5 +30,6 @@ ADR 001) build from an org's repo, so the layout is also what the platform reads
   prototype's `src/`, `design/flows.json`, `index.html`, configs and `package.json` under
   `prototypes/<name>/`, move `src/kit/` to `kit/`, and add the root `package.json` and
   `pnpm-workspace.yaml` from the template.
-- The root `netlify.toml` (the Acme demo) is removed: the demo becomes a customer-style repo in its
-  own GitHub org. Self-hosting on Netlify stays possible with one site per prototype (ADR 013).
+- Netlify is dropped (ADR 013 is superseded): the root `netlify.toml` (the Acme demo) and the
+  template's `netlify.toml` are removed. The demo becomes a customer-style repo in its own GitHub
+  org, with previews from the platform.

@@ -86,7 +86,7 @@ export function workspaceSuccess(ws: Workspace, opts: { contractOnly?: boolean }
 }
 
 // Files a new prototype copies from an existing one, so it gets the same pinned versions and setup.
-const SKELETON = ["package.json", "index.html", "vite.config.ts", "tsconfig.json", "netlify.toml", ".env.example", "src/main.tsx", "src/styles/global.css"];
+const SKELETON = ["package.json", "index.html", "vite.config.ts", "tsconfig.json", ".env.example", "src/main.tsx", "src/styles/global.css"];
 
 const EMPTY_FLOWS = `import { defineFlows } from "@cogitato/runtime";
 

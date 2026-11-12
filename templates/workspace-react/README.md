@@ -29,4 +29,4 @@ Each prototype is deployed on its own, one preview per branch, with its canvas a
   ```json
   "kit": { "previewUrl": "https://{host}.<preview domain>", "org": "<org>" }
   ```
-- **Self-hosted on Netlify:** make one site per prototype and set its base directory to `prototypes/<name>`. Each prototype folder has the `netlify.toml` it needs.
+- **Elsewhere:** each prototype's build (`prototypes/<name>/dist`) is a static site. Any static host can serve it, as long as every address serves `index.html`.

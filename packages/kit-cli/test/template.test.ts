@@ -115,21 +115,3 @@ describe("kit CLI", () => {
     expect(written.join("")).toMatch(/isn't a Cogitato workspace/);
   });
 });
-
-describe("Netlify config", () => {
-  // No TOML parser here: these check the lines a preview deploy depends on.
-  const configs = {
-    template: readFileSync(join(templateDir, "netlify.toml"), "utf8"),
-  };
-
-  it.each(Object.entries(configs))("%s: serves every route from the app and lets only its own canvas frame it", (_name, toml) => {
-    expect(toml).toMatch(/\[\[redirects\]\]\s+from = "\/\*"\s+to = "\/index.html"\s+status = 200/);
-    expect(toml).toMatch(/Content-Security-Policy = "frame-ancestors 'self'"/);
-    expect(toml).toMatch(/npx playwright install chromium/);
-  });
-
-  it("builds the prototype from its own folder, for self-hosting", () => {
-    expect(configs.template).toMatch(/command = "npx playwright install chromium && pnpm build"/);
-    expect(configs.template).toMatch(/publish = "dist"/);
-  });
-});
