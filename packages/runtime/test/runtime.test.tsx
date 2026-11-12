@@ -162,7 +162,7 @@ describe("kit preview", () => {
     const { container } = renderAt("/__kit", kit);
     expect(container.querySelectorAll(".kit-ui-card")).toHaveLength(manifests.length);
     expect(view.getAllByText("Button", { selector: "button" }).length).toBe(9);
-    expect(view.getByText(/no src\/kit\/Stack\.tsx/)).toBeTruthy();
+    expect(view.getByText(/no kit\/Stack\.tsx in the workspace yet\./)).toBeTruthy();
     expect(view.getByText("color.brand.600")).toBeTruthy();
   });
 });

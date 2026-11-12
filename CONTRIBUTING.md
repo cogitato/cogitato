@@ -15,7 +15,7 @@ Requires Node 22+ and pnpm.
 ```
 pnpm install
 pnpm build && pnpm typecheck && pnpm test
-pnpm --filter @cogitato/template-prototype-react dev   # http://localhost:5173, canvas at /__canvas
+pnpm --filter @cogitato/template-checkout dev   # http://localhost:5173, canvas at /__canvas
 ```
 
 Read [`CLAUDE.md`](CLAUDE.md) and the [architecture docs](docs/architecture/overview.md) before larger changes. File formats in [`interfaces.md`](docs/architecture/interfaces.md) are contracts between packages: change one only together with its schema, `schemaVersion` and every consumer. Decisions are recorded as ADRs in [`docs/decisions/`](docs/decisions).

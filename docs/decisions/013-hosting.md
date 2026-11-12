@@ -1,6 +1,6 @@
 # ADR 013: Netlify branch previews, with best-effort snapshots
 
-- **Status:** Accepted. Configured and tested locally; not deployed yet.
+- **Status:** Superseded (2026-11-12). Cogitato no longer uses Netlify: hosted previews come from the platform (platform ADR 001), and the template ships no Netlify config. Never deployed.
 - **Date:** 2026-11-02
 - **Resolves:** open decision #7
 

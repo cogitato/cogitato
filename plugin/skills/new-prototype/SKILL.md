@@ -1,7 +1,7 @@
 ---
 name: new-prototype
-description: Start a brand-new Cogitato prototype in its own folder, ready to open in Claude Code. Use when the designer wants to start a new prototype or project, not add to the current one.
-when_to_use: 'For example "start a new prototype for the onboarding flow", "I want a fresh project for the settings redesign", "create a new Cogitato prototype".'
+description: Start a new prototype in this design workspace, next to the others and sharing their design kit. Use when the designer wants a new prototype or project, not more screens in the current one.
+when_to_use: 'For example "start a new prototype for the onboarding flow", "I want a fresh prototype for the settings redesign".'
 argument-hint: "[what the prototype is for]"
 ---
 
@@ -11,13 +11,10 @@ The person is usually a designer. You run every command yourself, and explain ea
 
 Request: $ARGUMENTS
 
-1. **Name it.** Pick a short folder name from what it's for, in lowercase with dashes (`onboarding-flow`), and confirm it in one sentence.
-2. **Pick where.** Put it next to the current folder, not inside it: a prototype inside another prototype confuses the tools. If the current folder isn't a prototype, put it here. Check the folder doesn't already exist.
-3. **Create it** with `npm create cogitato@latest <folder>`.
-   - This copies the prototype template, installs its parts, and starts its history.
-   - If `npm` isn't there, Node.js is missing. Offer the setup-machine skill first.
-4. **Hand over:**
-   - Tell the designer it's ready.
-   - Say it starts with the Acme Shop example design system until their team's is added.
-   - Tell them to open the new folder in Claude Code (File → Open Folder, or a new session in that folder), where they can describe their first screen.
-   - Opening the folder also turns on Cogitato's tools there.
+1. **Name it.** Pick a short name from what it's for, in lowercase with dashes (`onboarding`, `account-settings`), and confirm it in one sentence. Check `list_prototypes` so it isn't taken.
+2. **Create it** with `pnpm kit new-prototype <name>` in the workspace root. It adds `prototypes/<name>/` with the same setup as the others and an empty Home screen.
+3. **Install its parts** with `pnpm install` in the workspace root.
+4. **Start it.** Start `pnpm dev <name>` in the workspace root in the background, the way the setup-machine skill starts a prototype. Wait until it prints its local address (usually http://localhost:5173, or the next port if another prototype is already running).
+5. **Hand over:** tell the designer it's ready and uses the team's design kit, give them the address it printed with `/__canvas` on the end to see it on the canvas, and ask what the first screen should be.
+
+If this folder isn't a Cogitato workspace at all, there's no workspace to add to yet: create one with `npm create cogitato@latest <folder>` next to the current folder, and tell the designer to open it in Claude Code.

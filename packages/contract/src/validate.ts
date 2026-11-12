@@ -404,14 +404,14 @@ export function validateSpec(data: unknown, file = "spec.json", flows?: FlowMani
 }
 
 /**
- * Validates a prototype's whole design/ folder: the contract (required), and flows.json,
- * annotations/*.json and handoff/{initiative}/spec.json when present.
- * File names in issues are relative to the design/ folder.
+ * Validates a prototype's design folder. `contractDir` is the design contract; in a workspace
+ * it's shared by every prototype (design/contract at the workspace root).
+ * Validates the contract (required), and flows.json, annotations/*.json and
+ * handoff/{initiative}/spec.json when present. File names in issues are relative to the design/ folder.
  */
-export function validateProject(designDir: string): ValidationResult {
+export function validateProject(designDir: string, contractDir: string = join(designDir, "contract")): ValidationResult {
   const issues: Issue[] = [];
 
-  const contractDir = join(designDir, "contract");
   if (!existsSync(contractDir)) {
     issues.push(error("file-missing", "contract/", "", "Can't find the contract folder (design/contract). The prototype needs a design contract."));
   } else {

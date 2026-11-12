@@ -1,6 +1,6 @@
 ---
 name: new-screen
-description: Create a new screen in a Cogitato prototype from a plain-language description, built only from the team's design kit, checked, and linked. Use when the designer asks for a new screen, page or step.
+description: Create a new screen in a prototype of a Cogitato design workspace from a plain-language description, built only from the team's design kit, checked, and linked. Use when the designer asks for a new screen, page or step.
 when_to_use: 'For example "add a review screen before payment", "I need a new order history page", "make a screen where people pick a delivery slot".'
 argument-hint: "[what the screen is for]"
 allowed-tools: mcp__plugin_cogitato_kit__list_components mcp__plugin_cogitato_kit__get_component mcp__plugin_cogitato_kit__get_tokens mcp__plugin_cogitato_kit__create_screen mcp__plugin_cogitato_kit__add_state mcp__plugin_cogitato_kit__log_gap mcp__plugin_cogitato_kit__validate mcp__plugin_cogitato_kit__canvas_link
@@ -12,7 +12,7 @@ The person is usually a designer, not a developer. Talk in plain language about 
 
 Request: $ARGUMENTS
 
-1. **Understand it.** Work out what the screen is for and which step leads to it. Ask one short question only if you can't tell. Otherwise state your plan in a sentence ("I'll add a Review screen after Payment, reached by a Review order button") and go ahead.
+1. **Understand it.** Work out what the screen is for and which step leads to it. Ask one short question only if you can't tell. If the workspace has more than one prototype (`list_prototypes`) and it isn't clear which, ask, then pass `prototype` to the tools. Otherwise state your plan in a sentence ("I'll add a Review screen after Payment, reached by a Review order button") and go ahead.
 2. **Create it** with `create_screen`:
    - `id`: lowercase words with dots, grouped with its neighbours (`checkout.review` next to `checkout.payment`).
    - `title`: the name people see.

@@ -8,7 +8,7 @@ exports[`seeded bad prototypes > contract-problem 1`] = `
 
 exports[`seeded bad prototypes > css-hardcoded-color 1`] = `
 [
-  "[error] src/kit/Button.module.css:41 #2563eb is color.brand.600 (Brand Blue 600) in the palette. Use the token instead of typing the color, so it stays in sync with the design system. => var(--kit-color-brand-600)",
+  "[error] src/components/Page.module.css:4 #2563eb is color.brand.600 (Brand Blue 600) in the palette. Use the token instead of typing the color, so it stays in sync with the design system. => var(--kit-color-brand-600)",
 ]
 `;
 
@@ -21,13 +21,13 @@ exports[`seeded bad prototypes > css-hardcoded-size 1`] = `
 
 exports[`seeded bad prototypes > css-off-palette-color 1`] = `
 [
-  "[error] src/kit/Card.module.css:2 This color (#fdfdfd) isn't in the palette. Use color.surface.default instead; it's the closest match. => var(--kit-color-surface-default)",
+  "[error] src/components/Page.module.css:4 This color (#fdfdfd) isn't in the palette. Use color.surface.default instead; it's the closest match. => var(--kit-color-surface-default)",
 ]
 `;
 
 exports[`seeded bad prototypes > css-unknown-token 1`] = `
 [
-  "[error] src/kit/Button.module.css:46 var(--kit-color-brand-650) isn't a token in the design system. Check the spelling; did you mean var(--kit-color-brand-600)? => var(--kit-color-brand-600)",
+  "[error] src/components/Page.module.css:4 var(--kit-color-brand-650) isn't a token in the design system. Check the spelling; did you mean var(--kit-color-brand-600)? => var(--kit-color-brand-600)",
 ]
 `;
 
@@ -107,6 +107,12 @@ exports[`seeded bad prototypes > missing-kit-id-kit-component 1`] = `
 exports[`seeded bad prototypes > missing-kit-id-native 1`] = `
 [
   "[error] src/screens/checkout/payment/screen.tsx:33 This <button> needs a data-kit-id so comments can be pinned to it. Add data-kit-id="checkout.payment.need-help". => checkout.payment.need-help",
+]
+`;
+
+exports[`seeded bad prototypes > route-is-screen-list 1`] = `
+[
+  "[error] src/screens/basket/screen.tsx:5 The address "/" is the prototype's list of screens, so a screen can't use it. Pick another one, like "/home".",
 ]
 `;
 

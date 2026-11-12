@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { FlowManifest, GapLog } from "@cogitato/contract";
 import { KitError, addEdge, addGap, addState, createScreen, exportFlows, projectAt, stateLink, validate, type Project } from "../src/index.js";
-import { copyTemplate } from "./helpers.js";
+import { copyTemplate, removeTemplate } from "./helpers.js";
 
 let root: string;
 let project: Project;
@@ -14,7 +14,7 @@ beforeEach(() => {
   root = copyTemplate();
   project = projectAt(root);
 });
-afterEach(() => rmSync(root, { recursive: true, force: true }));
+afterEach(() => removeTemplate(root));
 
 describe("createScreen", () => {
   it("writes a screen that validates and shows up in flows.json with its arrow", () => {
@@ -34,6 +34,9 @@ describe("createScreen", () => {
     expect(() => createScreen(project, { id: "cart" })).toThrow(/already a screen called "cart"/);
     expect(() => createScreen(project, { id: "Checkout Review" })).toThrow(KitError);
     expect(() => createScreen(project, { id: "basket", route: "/cart" })).toThrow(/already used by the Cart screen/);
+    expect(() => createScreen(project, { id: "basket", route: "/" })).toThrow(
+      `The address "/" is the prototype's list of screens, so a screen can't use it. Pick another one, like "/home".`,
+    );
     expect(() => createScreen(project, { id: "basket", route: "basket" })).toThrow(/needs to start with "\/"/);
     expect(() => createScreen(project, { id: "basket", from: "cart.missing" })).toThrow(/no state called "missing"/);
   });
@@ -119,15 +122,15 @@ describe("addGap", () => {
       },
     });
     expect(addGap(project, { kind: "component", name: "date picker", context: "again", requestedBy: "sam" })).toMatchObject({ created: false, gap: { id: "gap_date-picker" } });
-    const log = JSON.parse(read("design/contract/gaps.json")) as GapLog;
+    const log = JSON.parse(read("../../design/contract/gaps.json")) as GapLog;
     expect(log.gaps.map((g) => g.id)).toEqual(["gap_stepper", "gap_date-picker"]);
     expect(validate(project, { contractOnly: true })).toEqual({ ok: true, issues: [] });
   });
 
   it("suffixes the id when it's taken by a gap that's closed", () => {
-    const log = JSON.parse(read("design/contract/gaps.json")) as GapLog;
+    const log = JSON.parse(read("../../design/contract/gaps.json")) as GapLog;
     log.gaps[0]!.status = "resolved";
-    writeFileSync(join(root, "design/contract/gaps.json"), JSON.stringify(log));
+    writeFileSync(join(root, "../../design/contract/gaps.json"), JSON.stringify(log));
     expect(addGap(project, { kind: "component", name: "Stepper", context: "Progress", requestedBy: "sam", now }).gap.id).toBe("gap_stepper-2");
   });
 });

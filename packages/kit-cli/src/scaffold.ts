@@ -150,6 +150,7 @@ export function createScreen(project: Project, opts: CreateScreenOptions): Scaff
   const reg = registryOf(project);
   if (reg.screens.some((s) => s.id === id)) throw new KitError(`There's already a screen called "${id}".`);
   const route = opts.route ?? `/${id.split(".").join("/")}`;
+  if (route === "/") throw new KitError(`The address "/" is the prototype's list of screens, so a screen can't use it. Pick another one, like "/home".`);
   if (!route.startsWith("/")) throw new KitError(`The address "${route}" needs to start with "/", like "/checkout/review".`);
   const clash = reg.screens.find((s) => s.route === route);
   if (clash) throw new KitError(`The address "${route}" is already used by the ${clash.title} screen. Pick another one.`);

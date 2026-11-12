@@ -4,14 +4,14 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { tokenCssVar, validateFormat, type FlowManifest } from "@cogitato/contract";
 import { main } from "../src/cli.js";
 import { exportFlows, projectAt, readContract, validate } from "../src/index.js";
-import { applyOps, copyTemplate, referenceFlows, templateDir } from "./helpers.js";
+import { applyOps, copyTemplate, referenceFlows, templateDir, removeTemplate, workspaceDir } from "./helpers.js";
 
 const template = projectAt(templateDir);
 
 describe("the template prototype", () => {
   let root: string | undefined;
   afterEach(() => {
-    if (root) rmSync(root, { recursive: true, force: true });
+    if (root) removeTemplate(root);
     root = undefined;
   });
 
@@ -63,10 +63,10 @@ describe("the template prototype", () => {
 
   it("only reports problems in the files it was given", () => {
     root = copyTemplate();
-    applyOps(root, [{ op: "replace", file: "src/kit/Card.module.css", find: "background: var(--kit-color-surface-default);", with: "background: #fff;" }]);
+    applyOps(root, [{ op: "replace", file: "src/components/Page.module.css", find: "margin: 0 auto;", with: "margin: 0 auto; background: #fff;" }]);
     const p = projectAt(root);
     expect(validate(p, { files: ["src/screens/cart/screen.tsx"] }).issues).toEqual([]);
-    expect(validate(p, { files: [join(root, "src/kit/Card.module.css")] }).issues.map((i) => i.code)).toEqual(["code-hardcoded-color"]);
+    expect(validate(p, { files: [join(root, "src/components/Page.module.css")] }).issues.map((i) => i.code)).toEqual(["code-hardcoded-color"]);
   });
 });
 
@@ -105,33 +105,13 @@ describe("kit CLI", () => {
       return true;
     });
     const cwd = process.cwd();
-    process.chdir(join(templateDir, "..", ".."));
+    process.chdir(join(workspaceDir, ".."));
     try {
       expect(await main(["validate"])).toBe(2);
     } finally {
       process.chdir(cwd);
       vi.restoreAllMocks();
     }
-    expect(written.join("")).toMatch(/isn't a Cogitato prototype/);
-  });
-});
-
-describe("Netlify config", () => {
-  // No TOML parser here: these check the lines a preview deploy depends on.
-  const configs = {
-    template: readFileSync(join(templateDir, "netlify.toml"), "utf8"),
-    monorepo: readFileSync(join(templateDir, "..", "..", "netlify.toml"), "utf8"),
-  };
-
-  it.each(Object.entries(configs))("%s: serves every route from the app and lets only its own canvas frame it", (_name, toml) => {
-    expect(toml).toMatch(/\[\[redirects\]\]\s+from = "\/\*"\s+to = "\/index.html"\s+status = 200/);
-    expect(toml).toMatch(/Content-Security-Policy = "frame-ancestors 'self'"/);
-    expect(toml).toMatch(/npx playwright install chromium/);
-  });
-
-  it("builds the template and everything it depends on from the monorepo", () => {
-    expect(configs.monorepo).toMatch(/pnpm --filter @cogitato\/template-prototype-react\.\.\. build/);
-    expect(configs.monorepo).toMatch(/publish = "templates\/prototype-react\/dist"/);
-    expect(configs.template).toMatch(/publish = "dist"/);
+    expect(written.join("")).toMatch(/isn't a Cogitato workspace/);
   });
 });

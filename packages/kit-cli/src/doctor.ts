@@ -2,7 +2,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { validateProject } from "@cogitato/contract";
 import { buildManifest, readFlowsJson, sameManifest } from "./flows.js";
-import { LAYOUT, sourceFiles, type Project } from "./project.js";
+import { LAYOUT, WORKSPACE_LAYOUT, sourceFiles, type Project } from "./project.js";
 import { readRegistry } from "./registry.js";
 
 export type CheckStatus = "ok" | "warning" | "problem";
@@ -40,10 +40,15 @@ function envKeys(path: string): string[] {
     .filter((k): k is string => Boolean(k));
 }
 
-/** Machine health check for a prototype. Every message is written for a designer. */
-export async function doctor(project: Project, opts: DoctorOptions = {}): Promise<DoctorCheck[]> {
+const collector = () => {
   const checks: DoctorCheck[] = [];
   const add = (id: string, status: CheckStatus, message: string) => checks.push({ id, status, message });
+  return { checks, add };
+};
+
+/** Checks that are the same for every prototype on this computer: Node, pnpm and the dev server's port. */
+export async function machineChecks(opts: DoctorOptions = {}): Promise<DoctorCheck[]> {
+  const { checks, add } = collector();
 
   const major = Number(process.versions.node.split(".")[0]);
   add(
@@ -61,16 +66,32 @@ export async function doctor(project: Project, opts: DoctorOptions = {}): Promis
     );
   }
 
-  const installed = ["@cogitato/runtime", "@cogitato/contract", "@cogitato/kit-mcp"].every((p) =>
-    existsSync(project.abs(`node_modules/${p}/package.json`)),
-  );
+  if (!opts.offline) {
+    const port = opts.port ?? DEFAULT_PORT;
+    const up = await isServerUp(port);
+    add(
+      "dev-server",
+      up ? "ok" : "warning",
+      up ? `The prototype is running at http://localhost:${port}.` : `The prototype isn't running. Start it to see your screens (port ${port}).`,
+    );
+  }
+  return checks;
+}
+
+/** Checks for one prototype: its installed parts, the contract, flows.json and its .env settings. */
+export function prototypeChecks(project: Project): DoctorCheck[] {
+  const { checks, add } = collector();
+
+  const installed =
+    ["@cogitato/contract", "@cogitato/kit-mcp"].every((p) => existsSync(project.workspace.abs(`node_modules/${p}/package.json`))) &&
+    existsSync(project.abs("node_modules/@cogitato/runtime/package.json"));
   add(
     "dependencies",
     installed ? "ok" : "problem",
     installed ? "The prototype's parts are installed." : "The prototype's parts aren't installed yet. Run the setup (pnpm install) once.",
   );
 
-  const contract = validateProject(project.abs(LAYOUT.design));
+  const contract = validateProject(project.abs(LAYOUT.design), project.workspace.abs(WORKSPACE_LAYOUT.contract));
   const contractErrors = contract.issues.filter((i) => i.severity === "error").length;
   add(
     "contract",
@@ -93,16 +114,6 @@ export async function doctor(project: Project, opts: DoctorOptions = {}): Promis
         : "flows.json is out of date. Run kit export-flows.",
   );
 
-  if (!opts.offline) {
-    const port = opts.port ?? DEFAULT_PORT;
-    const up = await isServerUp(port);
-    add(
-      "dev-server",
-      up ? "ok" : "warning",
-      up ? `The prototype is running at http://localhost:${port}.` : `The prototype isn't running. Start it to see your screens (port ${port}).`,
-    );
-  }
-
   const needed = envKeys(project.abs(".env.example"));
   const present = new Set(envKeys(project.abs(".env")));
   const missing = needed.filter((k) => !present.has(k));
@@ -116,6 +127,11 @@ export async function doctor(project: Project, opts: DoctorOptions = {}): Promis
         : "No settings are needed.",
   );
   return checks;
+}
+
+/** Machine health check for a prototype. Every message is written for a designer. */
+export async function doctor(project: Project, opts: DoctorOptions = {}): Promise<DoctorCheck[]> {
+  return [...(await machineChecks(opts)), ...prototypeChecks(project)];
 }
 
 export function formatDoctor(checks: DoctorCheck[], quiet = false): string {

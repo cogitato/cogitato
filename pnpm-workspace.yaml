@@ -1,6 +1,7 @@
 packages:
   - "packages/*"
   - "apps/*"
-  - "templates/*"
+  - "templates/workspace-react"
+  - "templates/workspace-react/prototypes/*"
 allowBuilds:
   esbuild: true

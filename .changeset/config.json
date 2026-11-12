@@ -17,7 +17,8 @@
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": [
-    "@cogitato/template-prototype-react"
+    "@cogitato/template-workspace-react",
+    "@cogitato/template-checkout"
   ],
   "snapshot": {
     "prereleaseTemplate": "{tag}-{commit}"

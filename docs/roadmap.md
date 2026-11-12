@@ -23,11 +23,12 @@ Pick one **pilot product** with a known design system to use throughout Phases 1
 
 **Exit:** a designer with no terminal use builds a validated flow from plain-language prompts. **First real designer test.**
 
-## Phase 3 — Canvas + hosting (3 weeks)
+## Phase 3 — Canvas + hosting
 - Canvas app, local mode then hosted mode ([07](architecture/components/07-canvas.md))
-- Netlify previews with `flows.json` + snapshots ([10](architecture/components/10-hosting.md))
+- A design workspace per org, a folder per prototype ([ADR 017](decisions/017-multi-prototype-workspace.md)) — first, in the open packages (0.2.0)
+- Hosted previews through the platform's GitHub App, built on AWS (platform ADR 001)
 
-**Exit:** pushing a branch shows the whole flow as live frames on the hosted canvas.
+**Exit:** a push to `acme-shop-demo/acme-design` produces a protected preview on our preview domain that loads as live frames at `/__canvas`, with no manual steps.
 
 ## Distribution (before Phase 4, about 1 week) — done 2026-11-03
 Open core, per [ADR 015](decisions/015-open-core-and-hosted-platform.md):

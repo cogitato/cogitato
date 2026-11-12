@@ -1,7 +1,7 @@
 import { posix } from "node:path";
 import ts from "typescript";
 import { issueAt, literalText, propertyName, type Issue } from "../issue.js";
-import { LAYOUT, isKitFile, type ContractView } from "../project.js";
+import { WORKSPACE_LAYOUT, type ContractView } from "../project.js";
 import { ID_PATTERNS, type ScreenEntry } from "../registry.js";
 import { FINDING_CODES, SUBSTITUTION, checkCssNumber, checkCssValue } from "./css-values.js";
 
@@ -18,17 +18,20 @@ export interface TsxContext {
   contract: ContractView;
   /** The screen whose folder contains this file, if any. */
   owner?: ScreenEntry;
+  /** True for a file in the shared kit: screen-only rules (kit imports, data-kit-id on elements) don't apply. */
+  inKit?: boolean;
 }
 
 const NATIVE_INTERACTIVE = new Set(["button", "a", "input", "select", "textarea"]);
 
-/** Kit component name for an import specifier, or undefined if it doesn't point into src/kit. */
+/** Kit component name for an import specifier, or undefined if it doesn't point into the shared kit. */
 function kitImportName(file: string, specifier: string): string | undefined {
   let rest: string | undefined;
   if (specifier.startsWith("@/kit/")) rest = specifier.slice("@/kit/".length);
   else if (specifier.startsWith(".")) {
     const target = posix.normalize(posix.join(posix.dirname(file), specifier));
-    if (target.startsWith(`${LAYOUT.kit}/`)) rest = target.slice(LAYOUT.kit.length + 1);
+    const kit = `../../${WORKSPACE_LAYOUT.kit}/`;
+    if (target.startsWith(kit)) rest = target.slice(kit.length);
   }
   const name = rest?.split("/")[0]?.replace(/\.(tsx?|jsx?)$/, "");
   // Lowercase files and stylesheets in the kit folder are helpers, not components.
@@ -69,8 +72,8 @@ export function checkTsxFile(sf: ts.SourceFile, ctx: TsxContext): { issues: Issu
   const issues: Issue[] = [];
   const kitIds: KitIdUse[] = [];
   const file = sf.fileName;
-  const inKit = isKitFile(file);
   const { contract, owner } = ctx;
+  const inKit = ctx.inKit === true;
   // Local identifier -> kit component name, from this file's imports.
   const kitLocals = new Map<string, string>();
 

@@ -1,7 +1,7 @@
 {
   "name": "cogitato",
   "displayName": "Cogitato",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Build coded prototypes from plain-language prompts, kept to your team's design system: screens, states, checks after every edit, and saving versions.",
   "author": {
     "name": "Cogitato"

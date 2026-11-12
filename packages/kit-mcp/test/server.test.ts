@@ -5,22 +5,38 @@ import { fileURLToPath } from "node:url";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import type { GapLog } from "@cogitato/contract";
-import { projectAt } from "@cogitato/kit-cli";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { createServer, resolveProject } from "../src/index.js";
+import { createServer, resolveWorkspace } from "../src/index.js";
 
-const templateDir = fileURLToPath(new URL("../../../templates/prototype-react", import.meta.url));
+const workspaceDir = fileURLToPath(new URL("../../../templates/workspace-react", import.meta.url));
 
-let root: string;
+let root: string; // the workspace
+let proto: string; // prototypes/checkout
 let client: Client;
 
-beforeEach(async () => {
-  root = mkdtempSync(join(tmpdir(), "cogitato-mcp-"));
-  for (const part of ["src", "design", "package.json"]) cpSync(join(templateDir, part), join(root, part), { recursive: true });
+/** Copies the template workspace (no node_modules). With `second`, prototypes/onboarding is a copy of checkout. */
+function copyWorkspace(second = false): string {
+  const ws = mkdtempSync(join(tmpdir(), "cogitato-mcp-"));
+  for (const part of ["design", "kit", "package.json"]) cpSync(join(workspaceDir, part), join(ws, part), { recursive: true });
+  const checkout = join(ws, "prototypes", "checkout");
+  for (const part of ["src", "design", "package.json"]) cpSync(join(workspaceDir, "prototypes/checkout", part), join(checkout, part), { recursive: true });
+  if (second) cpSync(checkout, join(ws, "prototypes", "onboarding"), { recursive: true });
+  return ws;
+}
+
+async function connect(ws: string): Promise<Client> {
   const [a, b] = InMemoryTransport.createLinkedPair();
-  await createServer(projectAt(root)).connect(a);
-  client = new Client({ name: "test", version: "0" });
-  await client.connect(b);
+  await createServer(resolveWorkspace({ KIT_PROJECT: ws }, tmpdir())!).connect(a);
+  const c = new Client({ name: "test", version: "0" });
+  await c.connect(b);
+  return c;
+}
+
+beforeEach(async () => {
+  delete process.env.KIT_PROJECT;
+  root = copyWorkspace();
+  proto = join(root, "prototypes/checkout");
+  client = await connect(root);
 });
 afterEach(async () => {
   await client.close();
@@ -36,7 +52,7 @@ describe("kit MCP server", () => {
   it("lists every tool from the design doc, each with a description", async () => {
     const { tools } = await client.listTools();
     expect(tools.map((t) => t.name).sort()).toEqual(
-      ["add_state", "canvas_link", "create_screen", "get_component", "get_tokens", "list_components", "log_gap", "save_version", "set_status", "validate"].sort(),
+      ["add_state", "canvas_link", "create_screen", "get_component", "get_tokens", "list_components", "list_prototypes", "log_gap", "save_version", "set_status", "validate"].sort(),
     );
     for (const t of tools) expect(t.description?.length).toBeGreaterThan(30);
     expect(client.getInstructions()).toContain("instead of reading files in design/contract");
@@ -84,7 +100,7 @@ describe("kit MCP server", () => {
     expect((await call("set_status", { step: "checkout.payment.card-declined", status: "in-review" })).text).toBe(
       'checkout.payment.card-declined is now "In review" on the canvas (it was "Exploring").',
     );
-    const flows = JSON.parse(readFileSync(join(root, "design/flows.json"), "utf8")) as { status?: Record<string, string> };
+    const flows = JSON.parse(readFileSync(join(proto, "design/flows.json"), "utf8")) as { status?: Record<string, string> };
     expect(flows.status).toEqual({ "checkout.payment.card-declined": "in-review" });
     expect((await call("set_status", { step: "cart.missing", status: "approved" })).isError).toBe(true);
   });
@@ -104,11 +120,56 @@ describe("kit MCP server", () => {
   });
 });
 
-describe("resolveProject", () => {
+describe("resolveWorkspace", () => {
   it("prefers KIT_PROJECT, then CLAUDE_PROJECT_DIR, then the working folder", () => {
-    expect(resolveProject({ KIT_PROJECT: join(root, "src") }, tmpdir())?.root).toBe(root);
-    expect(resolveProject({ CLAUDE_PROJECT_DIR: root }, tmpdir())?.root).toBe(root);
-    expect(resolveProject({}, join(root, "design"))?.root).toBe(root);
-    expect(resolveProject({}, tmpdir())).toBeUndefined();
+    expect(resolveWorkspace({ KIT_PROJECT: join(proto, "src") }, tmpdir())?.root).toBe(root);
+    expect(resolveWorkspace({ CLAUDE_PROJECT_DIR: root }, tmpdir())?.root).toBe(root);
+    expect(resolveWorkspace({}, join(root, "design"))?.root).toBe(root);
+    expect(resolveWorkspace({}, tmpdir())).toBeUndefined();
+  });
+});
+
+describe("a workspace with several prototypes", () => {
+  it("works on the prototype named in the call, and asks when it's missing", async () => {
+    const two = copyWorkspace(true);
+    const c = await connect(two);
+    try {
+      const asked = await c.callTool({ name: "canvas_link", arguments: { step: "cart" } });
+      expect(asked.isError).toBe(true);
+      expect(JSON.stringify(asked.content)).toMatch(/several prototypes \(checkout, onboarding\)/);
+      const r = await c.callTool({ name: "canvas_link", arguments: { step: "cart", prototype: "onboarding" } });
+      expect(r.isError).toBeFalsy();
+      const list = await c.callTool({ name: "list_prototypes", arguments: {} });
+      expect(JSON.stringify(list.content)).toMatch(/checkout.*onboarding/);
+      // checking everything with no prototype named checks the whole workspace
+      const all = await c.callTool({ name: "validate", arguments: {} });
+      expect(all.isError).toBeFalsy();
+      // checking files needs a prototype
+      const files = await c.callTool({ name: "validate", arguments: { files: ["src/flows.ts"] } });
+      expect(files.isError).toBe(true);
+      expect(JSON.stringify(files.content)).toMatch(/Say which one/);
+      // the shared contract needs no prototype
+      expect((await c.callTool({ name: "list_components", arguments: {} })).isError).toBeFalsy();
+    } finally {
+      await c.close();
+      rmSync(two, { recursive: true, force: true });
+    }
+  });
+});
+
+describe("server details", () => {
+  it("reports this package's version and plain tool titles", async () => {
+    const pkg = JSON.parse(readFileSync(fileURLToPath(new URL("../package.json", import.meta.url)), "utf8")) as { version: string };
+    expect(client.getServerVersion()?.version).toBe(pkg.version);
+    const { tools } = await client.listTools();
+    expect(tools.find((t) => t.name === "validate")?.title).toBe("Check the prototypes");
+    expect(tools.find((t) => t.name === "save_version")?.description).toContain("shares it if the workspace has a shared copy");
+  });
+
+  it("checks the contract and kit of a workspace with no prototypes yet", async () => {
+    rmSync(join(root, "prototypes", "checkout"), { recursive: true, force: true });
+    const r = await call("validate");
+    expect(r.isError).toBe(false);
+    expect(r.text).toMatch(/no prototypes yet/);
   });
 });

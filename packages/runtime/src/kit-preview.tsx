@@ -13,9 +13,9 @@ import { generateDemos } from "./demos.js";
 export interface KitData {
   tokens: DesignTokens;
   manifests: ComponentManifest[];
-  /** Kit components by name, from src/kit/<Name>.tsx. */
+  /** Kit components by name, from the workspace's kit/<Name>.tsx. */
   components: Record<string, ComponentType<Record<string, unknown>>>;
-  /** Hand-written demos by component name, from src/kit/<Name>.demo.tsx. */
+  /** Hand-written demos by component name, from the workspace's kit/<Name>.demo.tsx. */
   demos: Record<string, ComponentType>;
 }
 
@@ -149,7 +149,7 @@ function ComponentCard({ manifest, kit }: { manifest: ComponentManifest; kit: Ki
       )}
 
       {!Impl && !CustomDemo ? (
-        <p className="kit-ui-error">Not built yet: there's no src/kit/{manifest.name}.tsx.</p>
+        <p className="kit-ui-error">Not built yet: there's no kit/{manifest.name}.tsx in the workspace yet.</p>
       ) : CustomDemo ? (
         <DemoBoundary>
           <CustomDemo />

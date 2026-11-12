@@ -1,5 +1,6 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { createServer } from "node:net";
 import { createRequire } from "node:module";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -13,12 +14,30 @@ import type { Project } from "./project.js";
 // the canvas shows placeholders instead. A deploy never fails because of snapshots (ADR 013).
 
 export const SNAPSHOT_VIEWPORT = { width: 1280, height: 800 } as const;
-const DEFAULT_PORT = 4319;
+
+/** A port the operating system says is free right now, so parallel builds and dev servers never collide. */
+export function freePort(): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const probe = createServer();
+    probe.once("error", reject);
+    probe.listen(0, () => {
+      const address = probe.address();
+      const port = typeof address === "object" && address ? address.port : 0;
+      probe.close(() => (port ? resolve(port) : reject(new Error("No free port could be found."))));
+    });
+  });
+}
 
 export interface SnapshotOptions {
   /** Built prototype folder, project-relative. */
   dist?: string;
+  /** Serve the build on this port. By default a free one is picked, so parallel builds don't collide. */
   port?: number;
+  /** For tests: replace the browser and the preview server. */
+  deps?: {
+    launchBrowser?: (project: Project) => Promise<Browser | string>;
+    startPreview?: (project: Project, vite: string, dist: string, port: number) => Promise<ChildProcess>;
+  };
   log?: (message: string) => void;
 }
 
@@ -44,14 +63,14 @@ export function snapshotManifest(nodes: string[], commit?: string): SnapshotMani
 const states = (m: FlowManifest) =>
   m.screens.flatMap((s) => s.states.map((st) => ({ node: `${s.id}.${st.id}`, url: `${s.route}?fixture=${encodeURIComponent(st.fixture)}&kit-frame=1` })));
 
-interface Page {
+export interface Page {
   goto(url: string, opts?: object): Promise<unknown>;
   waitForSelector(selector: string, opts?: object): Promise<unknown>;
   waitForLoadState(state: string, opts?: object): Promise<unknown>;
   waitForTimeout(ms: number): Promise<void>;
   screenshot(opts: object): Promise<unknown>;
 }
-interface Browser {
+export interface Browser {
   newPage(opts: object): Promise<Page>;
   close(): Promise<void>;
 }
@@ -115,16 +134,17 @@ export async function takeSnapshots(project: Project, opts: SnapshotOptions = {}
   if (!existsSync(project.abs(dist))) return { written: 0, skipped: "There's no built prototype to take snapshots of yet. Build it first." };
   if (!flows) return { written: 0, skipped: "There's no flow map (design/flows.json) yet, so there's nothing to take snapshots of." };
 
-  const vite = viteBin(project);
-  if (!vite) return { written: 0, skipped: "The prototype's parts aren't installed, so no snapshots were taken. The canvas will show placeholders instead." };
-  const browser = await launchBrowser(project);
+  const vite = opts.deps?.startPreview ? "" : viteBin(project);
+  if (vite === undefined) return { written: 0, skipped: "The prototype's parts aren't installed, so no snapshots were taken. The canvas will show placeholders instead." };
+  const browser = await (opts.deps?.launchBrowser ?? launchBrowser)(project);
   if (typeof browser === "string") return { written: 0, skipped: browser };
 
-  const port = opts.port ?? DEFAULT_PORT;
   let server: ChildProcess | undefined;
   const done: string[] = [];
+  let port = opts.port ?? 0;
   try {
-    server = await startPreview(project, vite, dist, port);
+    if (!opts.port) port = await freePort();
+    server = await (opts.deps?.startPreview ?? startPreview)(project, vite, dist, port);
     const page = await browser.newPage({ viewport: { ...SNAPSHOT_VIEWPORT } });
     mkdirSync(join(out, "snapshots"), { recursive: true });
     for (const { node, url } of states(flows)) {

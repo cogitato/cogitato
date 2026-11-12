@@ -2,7 +2,7 @@ import { readdirSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { projectAt, validate } from "../src/index.js";
-import { applyOps, badDir, copyTemplate, type BadCase } from "./helpers.js";
+import { applyOps, badDir, copyTemplate, type BadCase, removeTemplate } from "./helpers.js";
 
 const cases = readdirSync(badDir)
   .filter((f) => f.endsWith(".json"))
@@ -12,7 +12,7 @@ const cases = readdirSync(badDir)
 describe("seeded bad prototypes", () => {
   let root: string | undefined;
   afterEach(() => {
-    if (root) rmSync(root, { recursive: true, force: true });
+    if (root) removeTemplate(root);
     root = undefined;
   });
 
@@ -30,6 +30,7 @@ describe("seeded bad prototypes", () => {
       "code-screen-not-static",
       "code-unknown-flow-step",
       "code-flows-stale",
+      "code-invalid-route",
     ]) {
       expect(codes, code).toContain(code);
     }

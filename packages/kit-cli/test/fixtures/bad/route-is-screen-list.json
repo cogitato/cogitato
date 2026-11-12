@@ -1,0 +1,13 @@
+{
+  "description": "A screen at / would hide behind the prototype’s own list of screens",
+  "ops": [
+    {
+      "op": "write",
+      "file": "src/screens/basket/screen.tsx",
+      "text": "import { defineScreen } from \"@cogitato/runtime\";\n\nexport default defineScreen({\n  id: \"basket\",\n  route: \"/\",\n  title: \"Basket\",\n  fixtures: { default: { data: {} } },\n  component: () => null,\n});\n"
+    }
+  ],
+  "expect": [
+    "code-invalid-route"
+  ]
+}

@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
-import { CreateError, createPrototype, packageName } from "../src/create.js";
+import { CreateError, createWorkspace, packageName } from "../src/create.js";
 
 const pkgDir = fileURLToPath(new URL("..", import.meta.url));
 const templateDir = join(pkgDir, "template");
@@ -22,28 +22,45 @@ afterEach(() => {
 
 describe("the bundled template", () => {
   it("pins every Cogitato package to this release and carries none of our metadata", () => {
-    const pkg = JSON.parse(readFileSync(join(templateDir, "package.json"), "utf8")) as Record<string, Record<string, string>>;
-    const all = { ...pkg.dependencies, ...pkg.devDependencies };
+    const rootPkg = JSON.parse(readFileSync(join(templateDir, "package.json"), "utf8")) as Record<string, Record<string, string>>;
+    const protoPkg = JSON.parse(readFileSync(join(templateDir, "prototypes/checkout/package.json"), "utf8")) as Record<string, Record<string, string>>;
+    const all = { ...rootPkg.dependencies, ...rootPkg.devDependencies, ...protoPkg.dependencies, ...protoPkg.devDependencies };
     expect(Object.values(all).some((r) => r.startsWith("workspace:"))).toBe(false);
     expect(all["@cogitato/runtime"]).toBe(`^${version}`);
     expect(all["@cogitato/kit-cli"]).toBe(`^${version}`);
-    expect(pkg).not.toHaveProperty("license");
+    expect(rootPkg).not.toHaveProperty("license");
+    expect(protoPkg).not.toHaveProperty("license");
     expect(existsSync(join(templateDir, "node_modules"))).toBe(false);
+    expect(existsSync(join(templateDir, "prototypes/checkout/node_modules"))).toBe(false);
     expect(existsSync(join(templateDir, "_gitignore"))).toBe(true);
-    expect(readFileSync(join(templateDir, "pnpm-workspace.yaml"), "utf8")).toContain("esbuild: true");
-    expect(JSON.parse(readFileSync(join(templateDir, "design", "flows.json"), "utf8"))).not.toHaveProperty("commit");
+    expect(readFileSync(join(templateDir, "_pnpm-workspace.yaml"), "utf8")).toContain("esbuild: true");
+    expect(JSON.parse(readFileSync(join(templateDir, "prototypes/checkout/design/flows.json"), "utf8"))).not.toHaveProperty("commit");
   });
 });
 
-describe("createPrototype", () => {
-  it("creates a prototype folder named after the folder, with its .gitignore back", () => {
+describe("createWorkspace", () => {
+  it("creates a workspace named after the folder, with its .gitignore back", () => {
     tmp = mkdtempSync(join(tmpdir(), "create-cogitato-"));
-    const r = createPrototype({ target: join(tmp, "Checkout Ideas"), install: false, git: false });
+    const r = createWorkspace({ target: join(tmp, "Checkout Ideas"), install: false, git: false });
     expect(r).toMatchObject({ name: "checkout-ideas", installed: false, git: "skipped" });
-    for (const f of [".gitignore", ".claude/settings.json", "design/contract/tokens.json", "src/flows.ts", "netlify.toml", "CLAUDE.md"]) {
+    for (const f of [".gitignore", ".claude/settings.json", "design/contract/tokens.json", "kit", "prototypes/checkout/src/flows.ts", "CLAUDE.md"]) {
       expect(existsSync(join(r.dir, f)), f).toBe(true);
     }
     expect((JSON.parse(readFileSync(join(r.dir, "package.json"), "utf8")) as { name: string }).name).toBe("checkout-ideas");
+  });
+
+  it("creates a workspace with the checkout prototype, pinned and ready for pnpm", () => {
+    tmp = mkdtempSync(join(tmpdir(), "create-cogitato-"));
+    const r = createWorkspace({ target: join(tmp, "acme-design"), install: false, git: false, templateDir });
+    expect(r.prototypes).toEqual(["checkout"]);
+    expect(existsSync(join(r.dir, "pnpm-workspace.yaml"))).toBe(true);
+    expect(existsSync(join(r.dir, "_pnpm-workspace.yaml"))).toBe(false);
+    expect(existsSync(join(r.dir, ".gitignore"))).toBe(true);
+    const root = JSON.parse(readFileSync(join(r.dir, "package.json"), "utf8"));
+    expect(root.name).toBe("acme-design");
+    const proto = JSON.parse(readFileSync(join(r.dir, "prototypes/checkout/package.json"), "utf8"));
+    expect(proto.name).toBe("checkout");
+    expect(JSON.stringify([root, proto])).not.toMatch(/workspace:/);
   });
 
   it("starts git history when asked", () => {
@@ -52,20 +69,25 @@ describe("createPrototype", () => {
       vi.stubEnv(`GIT_${who}_NAME`, "Test Designer");
       vi.stubEnv(`GIT_${who}_EMAIL`, "designer@example.com");
     }
+    // Even when this computer's git starts new histories on another branch.
+    vi.stubEnv("GIT_CONFIG_COUNT", "1");
+    vi.stubEnv("GIT_CONFIG_KEY_0", "init.defaultBranch");
+    vi.stubEnv("GIT_CONFIG_VALUE_0", "master");
     tmp = mkdtempSync(join(tmpdir(), "create-cogitato-"));
-    const r = createPrototype({ target: join(tmp, "p"), install: false });
+    const r = createWorkspace({ target: join(tmp, "p"), install: false });
     expect(r.git).toBe("committed");
     expect(existsSync(join(r.dir, ".git"))).toBe(true);
+    expect(execFileSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], { cwd: r.dir, encoding: "utf8" }).trim()).toBe("main");
   });
 
   it("refuses a folder that already has files", () => {
     tmp = mkdtempSync(join(tmpdir(), "create-cogitato-"));
     writeFileSync(join(tmp!, "notes.txt"), "mine");
-    expect(() => createPrototype({ target: tmp!, install: false, git: false })).toThrow(CreateError);
+    expect(() => createWorkspace({ target: tmp!, install: false, git: false })).toThrow(CreateError);
   });
 
   it("makes npm-friendly names", () => {
     expect(packageName("/x/Acme Shop — v2")).toBe("acme-shop-v2");
-    expect(packageName("---")).toBe("my-prototype");
+    expect(packageName("---")).toBe("my-design");
   });
 });

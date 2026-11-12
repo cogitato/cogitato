@@ -7,7 +7,7 @@ import type { FlowManifest } from "@cogitato/contract/browser";
 import { Canvas, FrameCard, frameUrl, layoutFlows, touchLive, visibleFrames, type FrameCardData, type FrameCardNode } from "../src/index.js";
 
 // vitest runs from the package folder.
-const flows = JSON.parse(readFileSync(join(process.cwd(), "../../templates/prototype-react/design/flows.json"), "utf8")) as FlowManifest;
+const flows = JSON.parse(readFileSync(join(process.cwd(), "../../templates/workspace-react/prototypes/checkout/design/flows.json"), "utf8")) as FlowManifest;
 
 beforeAll(() => {
   // jsdom has no ResizeObserver; React Flow measures with it.
