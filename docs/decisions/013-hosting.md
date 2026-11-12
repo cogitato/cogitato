@@ -1,6 +1,6 @@
 # ADR 013: Netlify branch previews, with best-effort snapshots
 
-- **Status:** Accepted. Configured and tested locally; not deployed yet.
+- **Status:** Accepted. Configured and tested locally; not deployed yet. Self-hosted path only since ADR 017 and platform ADR 001; the Acme demo no longer deploys from this repo.
 - **Date:** 2026-11-02
 - **Resolves:** open decision #7
 

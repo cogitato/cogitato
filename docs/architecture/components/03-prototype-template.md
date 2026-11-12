@@ -1,6 +1,6 @@
 # 03 · Prototype Template + Fixture System
 
-**Location:** `templates/prototype-react`  ·  **Phase:** 1
+**Location:** `templates/workspace-react`  ·  **Phase:** 1
 
 ## Responsibility
 The app designers actually build in. Cloned into each prototype repo by intake.

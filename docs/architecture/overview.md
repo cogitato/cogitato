@@ -70,7 +70,7 @@ flowchart LR
 |---|-----------|----------|-------|
 | 1 | Design contract schema | `packages/contract` | [01-contract.md](components/01-contract.md) |
 | 2 | Kit CLI (validator, preview, export) | `packages/kit-cli` | [02-kit-cli.md](components/02-kit-cli.md) |
-| 3 | Prototype template + fixture system | `templates/prototype-react` | [03-prototype-template.md](components/03-prototype-template.md) |
+| 3 | Prototype template + fixture system | `templates/workspace-react` | [03-prototype-template.md](components/03-prototype-template.md) |
 | 4 | Claude Code plugin (skills, hooks, agents) | `plugin/` | [04-claude-plugin.md](components/04-claude-plugin.md) |
 | 5 | Kit MCP server | `packages/kit-mcp` | [05-kit-mcp.md](components/05-kit-mcp.md) |
 | 6 | Intake pipeline + decision review | `packages/intake` | [06-intake.md](components/06-intake.md) |
