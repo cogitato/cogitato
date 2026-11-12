@@ -12,7 +12,7 @@ Decisions needed before or during each phase. Leanings are proposals, not commit
 | 6 | Canvas library | Phase 3 | React Flow, tldraw (check license), custom | **Decided: React Flow, canvas at `/__canvas` in every prototype** ([ADR 012](012-canvas.md)) |
 | 7 | Hosting | Phase 3 | Netlify, Vercel | **Decided: the platform builds and hosts previews on AWS** (platform ADR 001). Netlify ([ADR 013](013-hosting.md)) is superseded |
 | 8 | Comment backend | Phase 4 | Liveblocks, Supabase, Yjs self-hosted | Evaluate in a spike |
-| 9 | Auth | Phase 4 | GitHub OAuth, team SSO | GitHub OAuth |
+| 9 | Auth | Phase 3 | GitHub OAuth, our own accounts, team SSO | **Decided: our own accounts** (email link or Google, GitHub optional, company SSO later), and admins invite members; only the admin who connects GitHub needs a GitHub account (platform ADR 001) |
 | 10 | Figma access in intake | Phase 5 | Figma connector/MCP, exported JSON, screenshots | Connector if available, JSON fallback |
 | 11 | Figma's role long-term | Later | Early exploration only, replaced | Parked (left open in the concept doc) |
 | 12 | Pilot product | Phase 2 | — | Phase 0–1 use the invented "Acme Shop" reference ([ADR 003](003-reference-pilot.md)); Phase 2 was built against it too. A real product must be chosen before the first designer test (Phase 2 exit) |
