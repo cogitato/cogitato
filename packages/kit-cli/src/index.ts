@@ -24,3 +24,4 @@ export {
   type CreateScreenOptions,
   type ScaffoldResult,
 } from "./scaffold.js";
+export { SHARED_INPUTS, affectedPrototypes, previewHost, slugPart } from "./hosting.js";
