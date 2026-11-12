@@ -1,4 +1,5 @@
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
+import { createServer } from "node:net";
 import { readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -10,6 +11,7 @@ import {
   projectAt,
   saveVersion,
   setStatus,
+  freePort,
   snapshotManifest,
   takeSnapshots,
   validate,
@@ -116,5 +118,33 @@ describe("snapshots", () => {
     const r = await takeSnapshots(project);
     // Depending on the machine, Playwright is either missing or has no browser installed; either way it skips.
     expect(r).toEqual({ written: 0, skipped: expect.stringMatching(/no snapshots were taken.*The canvas will show placeholders instead.$/) });
+  });
+
+  it("picks a free port for the preview when none is given, and honours --port", async () => {
+    const port = await freePort();
+    expect(port).toBeGreaterThan(0);
+    await new Promise<void>((res, rej) => {
+      const s = createServer();
+      s.once("error", rej);
+      s.listen(port, () => s.close(() => res()));
+    });
+
+    applyOps(root, [{ op: "write", file: "dist/index.html", text: "<!doctype html>" }]);
+    const used: number[] = [];
+    const page = { goto: async () => {}, waitForSelector: async () => {}, waitForLoadState: async () => {}, waitForTimeout: async () => {}, screenshot: async () => {} };
+    const deps = {
+      launchBrowser: async () => ({ newPage: async () => page, close: async () => {} }),
+      startPreview: async (_p: Project, _v: string, _d: string, p: number) => {
+        used.push(p);
+        return spawn(process.execPath, ["-e", "0"], { stdio: "ignore" });
+      },
+    };
+    await takeSnapshots(project, { deps });
+    await takeSnapshots(project, { deps });
+    expect(used[0]).not.toBe(4319);
+    expect(used[0]).not.toBe(5173);
+    expect(used[0]).not.toBe(used[1]);
+    await takeSnapshots(project, { deps, port: 4555 });
+    expect(used[2]).toBe(4555);
   });
 });

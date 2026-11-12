@@ -50,6 +50,7 @@ Commands that work on one prototype take --prototype <name> when you're at the w
       Set a state's review status on the canvas.
   kit snapshots [--dist <folder>] [--port <n>]
       Screenshot every state of the built prototype for the canvas (needs Playwright).
+      Uses a free port unless you give one.
   kit save [--message <m>]
       Save a version: commit on a design branch, and share it if there's a remote.
   kit hook <post-edit|session-start>

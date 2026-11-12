@@ -31,7 +31,7 @@ export { KitError } from "./errors.js";
 export { addGap, type AddGapOptions, type AddGapResult } from "./gaps.js";
 export { MCP_TOOLS, checkedByHook, postEditHook, runHook, sessionStartHook, type HookEvent, type HookInput, type HookOutput } from "./hook.js";
 export { CANVAS_PATH, canvasLink, previewLink, stateLink } from "./links.js";
-export { SNAPSHOT_VIEWPORT, snapshotFile, snapshotManifest, takeSnapshots, type SnapshotOptions, type SnapshotResult } from "./snapshots.js";
+export { SNAPSHOT_VIEWPORT, freePort, snapshotFile, snapshotManifest, takeSnapshots, type SnapshotOptions, type SnapshotResult } from "./snapshots.js";
 export { FRAME_STATUSES, setStatus, statusLabel, type FrameStatusValue } from "./status.js";
 export { describeChanges, saveVersion, type SaveOptions, type SaveResult } from "./save.js";
 export {
